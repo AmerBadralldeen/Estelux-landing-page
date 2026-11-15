@@ -2695,6 +2695,19 @@ export function App() {
             </button>
 
             <span>{t.footer.rights}</span>
+             <span>{t.footer.rights}</span>
+
+        <span className="text-[#CDBBB2]" aria-hidden="true">•</span>
+
+        <a
+          href="https://threedigitsoftware.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-semibold text-[#5A4E4A] hover:text-[#C47D6B] transition-colors"
+        >
+          {isRTL ? 'تطوير: ' : 'Powered by '}
+          <span className="underline underline-offset-4">threedigitsoftware.com</span>
+        </a>
           </div>
         </div>
       </footer>
