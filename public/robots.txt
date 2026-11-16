@@ -1,0 +1,46 @@
+# ESTELUX Istanbul — Search Engine & AI Discovery Policy
+# Canonical Domain: https://esteluxclinic.net
+
+User-agent: *
+Allow: /
+
+# Explicitly allow AI Search & Answer Engines for AI Visibility (GEO)
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+Sitemap: https://esteluxclinic.net/sitemap.xml
+# AI Knowledge Summary: https://esteluxclinic.net/llms.txt
+# Full AI Clinical Guide: https://esteluxclinic.net/llms-full.txt

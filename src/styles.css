@@ -1,1 +1,36 @@
 @import "tailwindcss";
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-color: #FAF7F2;
+    color: #4A3F3B;
+    overflow-x: hidden;
+  }
+}
+
+/* Custom subtle glass & luxury card utilities */
+.luxury-card-hover {
+  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+              border-color 0.28s ease;
+}
+
+.luxury-card-hover:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 42px -12px rgba(28, 25, 24, 0.09);
+}
+
+@keyframes pulseSubtle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.65; transform: scale(1.12); }
+}
+
+.animate-pulse-subtle {
+  animation: pulseSubtle 2.2s infinite ease-in-out;
+}

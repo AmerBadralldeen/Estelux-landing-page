@@ -16,6 +16,7 @@ import {
   ZoomIn,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   Sparkles,
   ExternalLink,
   LayoutDashboard,
@@ -39,13 +40,19 @@ import {
   Clock,
   CheckSquare,
   FileText,
-  KeyRound
+  KeyRound,
+  ShieldCheck,
+  Award,
+  Star,
+  Stethoscope,
+  HeartHandshake,
+  BadgeCheck,
+  Menu
 } from 'lucide-react';
 
 /**
- * ESTELUX Istanbul — High-Converting Single-Page Dental Aesthetics Landing Page
- * + Live Bilingual Admin Dashboard (Consultation Leads Inbox & Media/Gallery Manager)
- * Built with React, TypeScript, Tailwind CSS, and Lucide Icons.
+ * ESTELUX Istanbul — High-Converting Bilingual Dental Aesthetics & Medical Tourism Landing Page
+ * + Live Bilingual Coordinator Dashboard (Consultation Leads Inbox & Media/Gallery Manager)
  */
 
 type Language = 'en' | 'ar';
@@ -63,6 +70,8 @@ interface DentalCase {
   tagAr: string;
   captionEn: string;
   captionAr: string;
+  specsEn?: string;
+  specsAr?: string;
   visible: boolean;
 }
 
@@ -74,6 +83,7 @@ interface ConsultationLead {
   country: string;
   email: string;
   serviceValue: string;
+  timeline?: string;
   message: string;
   status: LeadStatus;
   adminNotes: string;
@@ -83,73 +93,105 @@ interface ConsultationLead {
 
 const WHATSAPP_DISPLAY = '+90 544 455 5513';
 const WHATSAPP_RAW = '905444555513';
-const DEFAULT_ADMIN_PIN = '1234';
+const ENV_ADMIN_PIN = (import.meta.env.VITE_ADMIN_PIN || '').trim();
 
 const STORAGE_KEYS = {
   leads: 'estelux_consultation_leads_v1',
-  cases: 'estelux_dental_cases_v1',
-  logo: 'estelux_brand_logo_v1',
-  heroPhoto: 'estelux_hero_photo_v1',
+  cases: 'estelux_dental_cases_v4',
+  logo: 'estelux_brand_logo_v4',
+  heroPhoto: 'estelux_hero_photo_v4',
   adminPin: 'estelux_admin_pin_v1',
+  adminSession: 'estelux_admin_auth_session_v1',
 };
 
 const DEFAULT_ASSETS = {
-  logo: 'Logo Colored.jpg',
-  case1: 'photo_6028350293931659414_y.jpg',
-  case2: 'photo_6028350293931659415_y.jpg',
-  case3: 'photo_6028350293931659416_y.jpg',
-  case4: 'photo_6028350293931659417_y.jpg',
-  heroDental:
-    'https://images.unsplash.com/photo-1606811841689-23dfddce3e95?auto=format&fit=crop&w=1400&q=85',
+  logo: '/estelux-logo.png',
+  case1: '/case-hollywood-2.jpg',
+  case2: '/case-cosmetic-1.jpg',
+  case3: '/case-hollywood-1.jpg',
+  case4: '/case-cosmetic-2.jpg',
+  case5: '/case-cosmetic-3.jpg',
+  heroDental: '/case-hollywood-2.jpg',
 };
+
+const BROKEN_LEGACY_FILES = new Set([
+  'Logo Colored.jpg',
+  '/estelux-logo.svg',
+  'photo_6028350293931659414_y.jpg',
+  'photo_6028350293931659415_y.jpg',
+  'photo_6028350293931659416_y.jpg',
+  'photo_6028350293931659417_y.jpg',
+]);
 
 const INITIAL_CASES: DentalCase[] = [
   {
     id: 'case-1',
     src: DEFAULT_ASSETS.case1,
-    category: 'cosmetic',
-    titleEn: 'Full Smile Restoration',
-    titleAr: 'ترميم الابتسامة الكامل',
-    tagEn: 'Cosmetic Dentistry',
-    tagAr: 'علاج الأسنان وتجميلها',
-    captionEn: 'Comprehensive aesthetic alignment and natural enamel restoration.',
-    captionAr: 'تناسق جمالي شامل وترميم طبيعي لمظهر الأسنان.',
+    category: 'hollywood',
+    titleEn: 'Hollywood Smile — Natural Arch Restoration',
+    titleAr: 'هوليوود سمايل — تجميل وتناسق الابتسامة الطبيعي',
+    tagEn: 'Hollywood Smile',
+    tagAr: 'هوليوود سمايل',
+    captionEn: 'Seamless replacement of missing upper incisor and full smile design with E-Max® porcelain veneers.',
+    captionAr: 'تعويض السن الأمامي المفقود وتصميم ابتسامة متكاملة بعدسات الإيماكس الخزفية.',
+    specsEn: '5 Days • Ivoclar E-Max®',
+    specsAr: '٥ أيام • إيماكس ألماني',
     visible: true,
   },
   {
     id: 'case-2',
     src: DEFAULT_ASSETS.case2,
-    category: 'hollywood',
-    titleEn: 'Hollywood Smile Design',
-    titleAr: 'تصميم هوليوود سمايل',
-    tagEn: 'Hollywood Smile',
-    tagAr: 'هوليوود سمايل',
-    captionEn: 'Structural reconstruction and custom shade harmony in Istanbul.',
-    captionAr: 'إعادة بناء الأسنان وتناغم مثالي للون والشكل في إسطنبول.',
+    category: 'cosmetic',
+    titleEn: 'Full-Mouth Cosmetic Dentistry Makeover',
+    titleAr: 'علاج الأسنان وتجميلها — تأهيل شامل للفكين',
+    tagEn: 'Cosmetic Dentistry',
+    tagAr: 'علاج الأسنان وتجميلها',
+    captionEn: 'Complete functional and aesthetic transformation of worn dentition using multilayer German zirconia crowns.',
+    captionAr: 'إعادة تأهيل شاملة للأسنان المتآكلة واستعادة البياض الطبيعي بتيجان الزيركون الألماني.',
+    specsEn: '6 Days • Multilayer Zirconia',
+    specsAr: '٦ أيام • زيركون متعدد الطبقات',
     visible: true,
   },
   {
     id: 'case-3',
     src: DEFAULT_ASSETS.case3,
     category: 'hollywood',
-    titleEn: 'Precision Aesthetic Makeover',
-    titleAr: 'تجميل الابتسامة بدقة عالية',
+    titleEn: 'Hollywood Smile — Full Bite & Shade Alignment',
+    titleAr: 'هوليوود سمايل — إعادة بناء الإطباق وتناغم اللون',
     tagEn: 'Hollywood Smile',
     tagAr: 'هوليوود سمايل',
-    captionEn: 'Balanced smile arc tailored to facial symmetry and natural radiance.',
-    captionAr: 'قوس ابتسامة متوازن مصمم خصيصاً ليتناغم مع ملامح الوجه.',
+    captionEn: 'Precision digital smile reconstruction correcting missing tooth gap, bite alignment, and enamel radiance.',
+    captionAr: 'تصميم رقمي متكامل لتعويض الفراغ الأمامي وتصحيح الإطباق بلون طبيعي مشرق.',
+    specsEn: '5 Days • 3D Digital Smile Design',
+    specsAr: '٥ أيام • تصميم رقمي ثلاثي الأبعاد',
     visible: true,
   },
   {
     id: 'case-4',
     src: DEFAULT_ASSETS.case4,
     category: 'cosmetic',
-    titleEn: 'Complete Oral Rehabilitation',
-    titleAr: 'إعادة تأهيل الفم والأسنان',
+    titleEn: 'Complete Upper & Lower Arch Rehabilitation',
+    titleAr: 'علاج الأسنان وتجميلها — تعويض وتجميل كامل',
     tagEn: 'Cosmetic Dentistry',
     tagAr: 'علاج الأسنان وتجميلها',
-    captionEn: 'Restoring both confident aesthetics and lasting dental function.',
-    captionAr: 'استعادة الجمال الطبيعي والوظيفة الصحية للأسنان.',
+    captionEn: 'Restoring missing upper teeth and severe attrition into a balanced, confident, and healthy smile.',
+    captionAr: 'تعويض الأسنان المفقودة والمتآكلة واستعادة الابتسامة الصحية والجمالية بالكامل.',
+    specsEn: '10-Year Written Warranty',
+    specsAr: 'ضمان دولي مكتوب ١٠ سنوات',
+    visible: true,
+  },
+  {
+    id: 'case-5',
+    src: DEFAULT_ASSETS.case5,
+    category: 'cosmetic',
+    titleEn: 'Aesthetic Smile Reconstruction',
+    titleAr: 'ترميم وتجميل الابتسامة المتقدم',
+    tagEn: 'Cosmetic Dentistry',
+    tagAr: 'علاج الأسنان وتجميلها',
+    captionEn: 'High-translucency aesthetic crowns crafted for natural gum harmony and facial balance in Istanbul.',
+    captionAr: 'تيجان خزفية عالية الشفافية مصممة لتتناغم مع اللثة وملامح الوجه في إسطنبول.',
+    specsEn: '6 Days • Istanbul Clinic',
+    specsAr: '٦ أيام • عيادة إسطنبول',
     visible: true,
   },
 ];
@@ -163,7 +205,8 @@ const INITIAL_LEADS: ConsultationLead[] = [
     country: 'Saudi Arabia',
     email: 'sara.m@example.com',
     serviceValue: 'hollywood',
-    message: 'أرغب في معرفة تكلفة هوليوود سمايل ومدة الإقامة المطلوبة في إسطنبول.',
+    timeline: 'Within 1–3 months',
+    message: 'أرغب في معرفة تكلفة هوليوود سمايل (20 سن) ومدة الإقامة المطلوبة في إسطنبول.',
     status: 'new',
     adminNotes: 'Prefer evening WhatsApp call after 6 PM Istanbul time.',
     createdAt: new Date(Date.now() - 1000 * 60 * 45).toISOString(),
@@ -171,191 +214,420 @@ const INITIAL_LEADS: ConsultationLead[] = [
   },
   {
     id: 'lead-102',
-    fullName: 'Daniel Weber',
-    countryCode: '+43',
-    phone: '6604481920',
-    country: 'Austria',
-    email: 'd.weber@example.at',
-    serviceValue: 'dental',
-    message: 'Looking for full upper and lower zirconia crowns + airport VIP pickup.',
+    fullName: 'Lukas Schneider',
+    countryCode: '+49',
+    phone: '1704481920',
+    country: 'Germany',
+    email: 'l.schneider@example.de',
+    serviceValue: 'zirconia',
+    timeline: 'As soon as possible',
+    message: 'Looking for full upper and lower German zirconia crowns + airport VIP pickup from Frankfurt flight.',
     status: 'contacted',
-    adminNotes: 'Sent panoramic X-ray instructions via WhatsApp.',
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(),
+    adminNotes: 'Sent panoramic X-ray instructions & 5-day treatment itinerary via WhatsApp.',
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 4).toISOString(),
     langSubmitted: 'en',
   },
   {
     id: 'lead-103',
-    fullName: 'طارق العتيبي',
-    countryCode: '+971',
-    phone: '509871122',
-    country: 'UAE',
-    email: '',
+    fullName: "Aoife O'Connor",
+    countryCode: '+353',
+    phone: '879871122',
+    country: 'Ireland',
+    email: 'aoife.oconnor@example.ie',
     serviceValue: 'implants',
-    message: 'استشارة بخصوص زراعة 4 أسنان مع حجز فندق قريب من العيادة.',
+    timeline: 'Within 1–3 months',
+    message: 'Interested in dental implants and porcelain veneers package with hotel near the clinic.',
     status: 'booked',
-    adminNotes: 'Confirmed arrival on the 22nd — VIP Transfer & Hotel arranged.',
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 26).toISOString(),
-    langSubmitted: 'ar',
+    adminNotes: 'Confirmed Dublin–Istanbul flight on the 22nd — VIP Transfer & 5-Star Hotel arranged.',
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 22).toISOString(),
+    langSubmitted: 'en',
   },
 ];
 
 const COUNTRY_CODES = [
-  { code: '+90', flag: '🇹🇷' },
-  { code: '+966', flag: '🇸🇦' },
-  { code: '+971', flag: '🇦🇪' },
-  { code: '+965', flag: '🇰🇼' },
-  { code: '+974', flag: '🇶🇦' },
-  { code: '+973', flag: '🇧🇭' },
-  { code: '+968', flag: '🇴🇲' },
-  { code: '+962', flag: '🇯🇴' },
-  { code: '+20', flag: '🇪🇬' },
-  { code: '+964', flag: '🇮🇶' },
-  { code: '+44', flag: '🇬🇧' },
-  { code: '+49', flag: '🇩🇪' },
-  { code: '+33', flag: '🇫🇷' },
-  { code: '+43', flag: '🇦🇹' },
-  { code: '+1', flag: '🇺🇸' },
+  { id: 'de', code: '+49', flag: '🇩🇪', label: 'Germany' },
+  { id: 'ie', code: '+353', flag: '🇮🇪', label: 'Ireland' },
+  { id: 'gb', code: '+44', flag: '🇬🇧', label: 'United Kingdom' },
+  { id: 'sa', code: '+966', flag: '🇸🇦', label: 'Saudi Arabia' },
+  { id: 'ae', code: '+971', flag: '🇦🇪', label: 'UAE' },
+  { id: 'kw', code: '+965', flag: '🇰🇼', label: 'Kuwait' },
+  { id: 'qa', code: '+974', flag: '🇶🇦', label: 'Qatar' },
+  { id: 'tr', code: '+90', flag: '🇹🇷', label: 'Türkiye' },
+  { id: 'at', code: '+43', flag: '🇦🇹', label: 'Austria' },
+  { id: 'ch', code: '+41', flag: '🇨🇭', label: 'Switzerland' },
+  { id: 'fr', code: '+33', flag: '🇫🇷', label: 'France' },
+  { id: 'nl', code: '+31', flag: '🇳🇱', label: 'Netherlands' },
+  { id: 'se', code: '+46', flag: '🇸🇪', label: 'Sweden' },
+  { id: 'bh', code: '+973', flag: '🇧🇭', label: 'Bahrain' },
+  { id: 'om', code: '+968', flag: '🇴🇲', label: 'Oman' },
+  { id: 'jo', code: '+962', flag: '🇯🇴', label: 'Jordan' },
+  { id: 'eg', code: '+20', flag: '🇪🇬', label: 'Egypt' },
+  { id: 'iq', code: '+964', flag: '🇮🇶', label: 'Iraq' },
+  { id: 'us', code: '+1', flag: '🇺🇸', label: 'USA / Canada' },
 ];
 
 const TRANSLATIONS = {
   en: {
     brandSubtitle: 'Look Beautiful, Live Healthy',
+    topBar: {
+      accredited: 'JCI & ISO Certified Partner Clinics in Istanbul',
+      materials: 'Certified German & Swiss Materials (Ivoclar E-Max® & Straumann®)',
+      warranty: '10-Year Written International Warranty',
+      onlineNow: 'Coordinators Online Now',
+    },
     nav: {
       homeAria: 'ESTELUX Home',
       logoAlt: 'ESTELUX — Look Beautiful, Live Healthy',
-      allServices: 'All services',
+      treatments: 'Treatments',
+      gallery: 'Smile Gallery',
+      whyUs: 'Why ESTELUX',
+      journey: 'Patient Journey',
+      reviews: 'Reviews',
+      faq: 'FAQ',
+      allServices: 'Other Specialties',
+      freeQuote: 'Free Smile Quote',
       langSwitch: 'العربية',
       whatsapp: 'WhatsApp',
       whatsappAria: 'Contact ESTELUX on WhatsApp',
       dashboardBtn: 'Dashboard',
       backToSite: 'View Landing Page',
+      returnToAdmin: 'Coordinator Mode Active — Return to Control Center',
     },
     hero: {
-      kicker: 'FEATURED SERVICE • ISTANBUL',
-      title: 'Dental Surgery & Cosmetic Dentistry',
+      kicker: 'PREMIER DENTAL AESTHETICS • ISTANBUL, TÜRKIYE',
+      responseBadge: 'Avg. Coordinator Reply: Under 10 Mins',
+      title: 'Dental Surgery & Luxury Smile Aesthetics',
       subtitle: 'Excellence in Medical Care',
-      slogan: 'Look Beautiful, Live Healthy — Excellence in Medical Care.',
-      lead: 'Discover personalized dental care and aesthetic dentistry in Istanbul. From your initial online consultation and medical assessment to treatment coordination and post-treatment follow-up, ESTELUX guides you through every step of your smile journey.',
-      whatsappCta: 'Contact us on WhatsApp',
+      slogan: 'Look Beautiful, Live Healthy — Precision Digital Dentistry in Istanbul.',
+      lead: 'Experience world-class Hollywood Smile veneers, German zirconia crowns, and Swiss dental implants in Istanbul—at up to 70% savings compared to Western Europe, the UK, and GCC. From your free 3D online assessment to VIP airport pickup and 5-star hotel stay, ESTELUX coordinates every detail.',
+      primaryCta: 'Get Free Treatment Plan',
+      whatsappCta: 'Chat on WhatsApp',
       whatsappPrefill:
-        'Hello ESTELUX, I am interested in Dental Surgery & Cosmetic Dentistry. I would like to receive more information and arrange a consultation.',
-      photoAlt: 'ESTELUX Dental Surgery & Cosmetic Dentistry consultation in Istanbul',
-      photoCaption: 'Personalized Dental Aesthetics & Smile Design in Istanbul',
-      resultsHeading: 'Clinical Smile Transformations',
-      resultsHint: 'Click any photo to enlarge',
-      verifiedBadge: 'Verified Clinical Case',
+        'Hello ESTELUX Istanbul, I am interested in a free dental consultation and treatment quote. Could you please share more details?',
+      photoAlt: 'ESTELUX Dental Surgery & Cosmetic Dentistry specialist suite in Istanbul',
+      photoCaption: '3D Digital Smile Design & Pain-Free Aesthetic Dentistry in Istanbul',
+      metrics: [
+        { value: '5,200+', label: 'Smile Transformations' },
+        { value: '15+ Yrs', label: 'Specialist Surgeons' },
+        { value: 'Up to 70%', label: 'Savings vs. EU & UK' },
+        { value: '10-Year', label: 'Written Warranty' },
+      ],
+      resultsHeading: 'Verified Clinical Smile Transformations',
+      resultsSub: 'Real patient outcomes achieved in 5–7 days in Istanbul. Click any case to inspect.',
+      resultsHint: 'Click to enlarge',
+      verifiedBadge: 'Verified Case',
       filters: {
         all: 'All Cases',
         hollywood: 'Hollywood Smile',
-        cosmetic: 'Cosmetic Dentistry',
+        cosmetic: 'Crowns & Implants',
       },
       casePrefix: 'Case #',
     },
+    treatmentsSection: {
+      kicker: 'SIGNATURE DENTAL PACKAGES',
+      heading: 'Tailored Dental Treatments in Istanbul',
+      sub: 'Every procedure uses CE & FDA-certified European materials with a written international warranty and VIP travel coordination.',
+      durationLabel: 'Istanbul Stay:',
+      warrantyLabel: 'Warranty:',
+      ctaText: 'Request Quote for This Treatment',
+      items: [
+        {
+          value: 'hollywood',
+          image: '/case-hollywood-2.jpg',
+          badge: 'Most Popular',
+          title: 'Hollywood Smile & E-Max® Veneers',
+          stay: '5–7 Days',
+          warranty: '10-Year Guarantee',
+          desc: 'Ultra-thin Ivoclar Vivadent® E-Max porcelain laminate veneers custom-crafted with 3D Digital Smile Design for natural translucency and facial harmony.',
+          highlights: [
+            '3D Digital Smile Preview & trial mock-up before bonding',
+            'Stain-resistant German porcelain in natural or Hollywood shades',
+            'Minimal tooth preparation preserving healthy enamel',
+          ],
+        },
+        {
+          value: 'zirconia',
+          image: '/case-cosmetic-1.jpg',
+          badge: 'Full Restoration',
+          title: 'German Zirconia Crowns & Cosmetic Dentistry',
+          stay: '5–7 Days',
+          warranty: '10-Year Guarantee',
+          desc: 'High-translucency multilayer monolithic zirconia crowns combining exceptional bite strength with lifelike enamel aesthetics.',
+          highlights: [
+            '100% biocompatible, metal-free German CAD/CAM zirconia',
+            'Ideal for damaged, heavily filled, or missing teeth bridges',
+            'Precision digital intraoral scanning (no messy impressions)',
+          ],
+        },
+        {
+          value: 'implants',
+          image: '/case-cosmetic-2.jpg',
+          badge: 'Permanent Solution',
+          title: 'Dental Implants & Full Arch Reconstruction',
+          stay: '3–5 Days / Stage',
+          warranty: 'Lifetime Implant Warranty',
+          desc: 'Swiss and German titanium implants placed with 3D CBCT computer-guided precision for missing teeth or full-jaw fixed rehabilitation.',
+          highlights: [
+            'Premium Straumann® & Nobel Biocare® implant systems',
+            'Immediate temporary fixed teeth so you never leave toothless',
+            'Painless local anesthesia or sedation options available',
+          ],
+        },
+        {
+          value: 'dental',
+          image: '/case-hollywood-1.jpg',
+          badge: 'Complete Smile Design',
+          title: 'Aesthetic Smile Reconstruction & Alignment',
+          stay: '5–7 Days',
+          warranty: '10-Year Guarantee',
+          desc: 'Comprehensive cosmetic dentistry and prosthetic rehabilitation correcting gaps, severe wear, and bite asymmetry in a single coordinated trip.',
+          highlights: [
+            'Custom shade and tooth morphology tailored to your face',
+            'Laser gum contouring (pink aesthetics) for balanced proportions',
+            'Includes panoramic X-ray, 3D CBCT scan, and aftercare kit',
+          ],
+        },
+      ],
+    },
+    whyUs: {
+      kicker: 'THE ESTELUX STANDARD',
+      heading: 'Why International Patients Trust ESTELUX',
+      sub: 'We combine senior prosthodontic artistry with effortless 5-star hospitality in the heart of Istanbul.',
+      items: [
+        {
+          title: 'Approve Your Smile Before Placement',
+          desc: 'Using 3D intraoral scanning and a physical trial mock-up, you see and approve the exact shape, length, and shade of your new teeth before final bonding.',
+        },
+        {
+          title: '100% Certified European Brands',
+          desc: 'Every veneer, crown, and implant comes with an official serial-numbered authenticity card from Ivoclar Vivadent®, Straumann®, or Nobel Biocare®.',
+        },
+        {
+          title: 'Transparent All-Inclusive Packages',
+          desc: 'Your personalized treatment quote covers 3D CBCT scans, panoramic X-rays, temporary teeth, medications, VIP airport transfers, and hotel coordination—with zero hidden clinic fees.',
+        },
+        {
+          title: 'Dedicated Multilingual Host 24/7',
+          desc: 'A personal English, German, or Arabic-speaking coordinator accompanies you at every clinic appointment so communication is effortless.',
+        },
+      ],
+    },
+    journey: {
+      kicker: 'HOW IT WORKS',
+      heading: 'Your 4-Step Smile Journey in Istanbul',
+      sub: 'From your first WhatsApp message to your final reveal, everything is organized for a stress-free experience.',
+      steps: [
+        {
+          num: '01',
+          title: 'Free Online Smile Assessment',
+          desc: 'Send us smile photos or a recent X-ray via WhatsApp or our form. Our senior dental surgeons prepare a detailed treatment plan and fixed price quote within 24 hours.',
+        },
+        {
+          num: '02',
+          title: 'VIP Arrival & 5-Star Hotel',
+          desc: 'Once you book your flight to Istanbul, our private VIP chauffeur greets you at the airport and drives you directly to your partner hotel and clinic appointments.',
+        },
+        {
+          num: '03',
+          title: '3D Digital Design & Treatment',
+          desc: 'We perform a 3D CBCT scan, design your custom smile digitally, fit your temporary teeth on day one, and craft your final restorations in our CAD/CAM lab.',
+        },
+        {
+          num: '04',
+          title: 'Final Smile Reveal & Warranty',
+          desc: 'After your final fitting and bite check, you receive your official 10-year / lifetime warranty certificate and ongoing remote aftercare support.',
+        },
+      ],
+    },
+    reviews: {
+      kicker: 'PATIENT STORIES',
+      heading: 'Trusted by Patients Across Europe & GCC',
+      sub: 'Read verified experiences from international patients who chose ESTELUX Istanbul for their smile transformation.',
+      verifiedLabel: 'Verified Patient',
+      items: [
+        {
+          name: 'Markus H.',
+          country: 'Munich, Germany 🇩🇪',
+          treatment: '20 E-Max® Veneers',
+          quote:
+            'My dentist in Munich quoted me over €16,000. At ESTELUX in Istanbul I paid a fraction of that, stayed in a 5-star hotel, and the digital smile design looks completely natural.',
+        },
+        {
+          name: 'Ciara Doyle',
+          country: 'Dublin, Ireland 🇮🇪',
+          treatment: 'Hollywood Smile & Gum Contouring',
+          quote:
+            'From the VIP pickup at Istanbul Airport to my final fitting, the coordination was flawless. Zero pain, no hidden costs, and I got to preview my teeth shape before they were cemented.',
+        },
+        {
+          name: 'Faisal Al-Harbi',
+          country: 'Riyadh, Saudi Arabia 🇸🇦',
+          treatment: 'Full-Mouth Zirconia Crowns',
+          quote:
+            'The Arabic-speaking coordinator accompanied me at every step. The clinic is ultra-modern and my new smile was finished in just 6 days.',
+        },
+        {
+          name: 'Charlotte Evans',
+          country: 'London, United Kingdom 🇬🇧',
+          treatment: 'Dental Implants & Crowns',
+          quote:
+            'I was nervous about traveling abroad for dental implants, but the surgeon explained my 3D scan in detail and gave me a written warranty certificate. Best decision I ever made.',
+        },
+      ],
+    },
+    faq: {
+      kicker: 'FREQUENTLY ASKED QUESTIONS',
+      heading: 'Everything You Need to Know Before Travelling',
+      sub: 'Have another question? Message our medical coordinators directly on WhatsApp for an instant answer.',
+      items: [
+        {
+          q: 'How many days do I need to stay in Istanbul for a Hollywood Smile or Crowns?',
+          a: 'For E-Max® porcelain veneers or German zirconia crowns, a stay of 5 to 7 days in Istanbul is sufficient. You will have 3 to 4 comfortable clinic visits with plenty of free time to enjoy Istanbul.',
+        },
+        {
+          q: 'How long does Dental Implant treatment take?',
+          a: 'Dental implant placement requires a 3 to 5 day visit for the surgical placement and temporary teeth. After a 3 to 4 month healing period (osseointegration) at home, you return for 5 to 6 days to fit your permanent zirconia or porcelain crowns.',
+        },
+        {
+          q: 'Are the procedures painful?',
+          a: 'No. All treatments are performed under modern digital local anesthesia (and sedation upon request) so you feel no pain during preparation or placement. We also provide complete post-care medication.',
+        },
+        {
+          q: 'Do you provide a written guarantee for veneers, crowns, and implants?',
+          a: 'Yes. Every patient receives an official written ESTELUX warranty certificate along with original manufacturer serial cards—covering E-Max® veneers and zirconia crowns for 10 years, and titanium dental implants for life.',
+        },
+        {
+          q: 'How can I get an accurate price quote before booking my flight?',
+          a: 'Simply submit the consultation form on this page or message us on WhatsApp with clear photos of your teeth (or a panoramic X-ray if available). Our surgeons will review your case free of charge and send a transparent, itemized treatment plan.',
+        },
+        {
+          q: 'What is included in the VIP transfer and hotel coordination?',
+          a: 'We arrange private airport pickup and drop-off in luxury VIP vehicles, all transfers between your hotel and our clinic, 5-star partner hotel accommodation near the clinic, and a dedicated native-speaking patient host.',
+        },
+      ],
+    },
     form: {
-      heading: 'Request a consultation',
-      intro: 'Leave your details so our Istanbul coordination team can arrange your personalized dental assessment.',
+      badge: '100% Free Online Medical Assessment',
+      heading: 'Request Your Free Smile Plan',
+      intro: 'Leave your details below. Our Istanbul medical coordinator will contact you with a personalized treatment plan and cost estimate.',
+      timelineLabel: 'When are you planning treatment?',
+      timelines: [
+        { value: 'As soon as possible', label: 'As soon as possible' },
+        { value: 'Within 1–3 months', label: 'Within 1–3 months' },
+        { value: 'Just researching / price check', label: 'Price check' },
+      ],
       countryCodeAria: 'Country dialing code',
       fullName: 'Full name',
       fullNamePlaceholder: 'Your full name',
       whatsapp: 'WhatsApp number',
-      whatsappPlaceholder: '5XX XXX XXXX',
-      country: 'Country',
-      countryPlaceholder: 'e.g., UK, Saudi Arabia, UAE',
+      whatsappPlaceholder: '7700 900077',
+      country: 'Country of residence',
+      countryPlaceholder: 'e.g., Germany, Ireland, UK, Saudi Arabia',
       email: 'Email address (optional)',
       emailPlaceholder: 'you@example.com',
-      serviceLabel: 'Interested service',
+      serviceLabel: 'Interested treatment',
       services: [
-        { value: 'dental', label: 'Dental Surgery & Cosmetic Dentistry' },
-        { value: 'hollywood', label: 'Hollywood Smile & Porcelain Veneers' },
-        { value: 'implants', label: 'Dental Implants & Oral Surgery' },
-        { value: 'hair', label: 'Hair Transplantation' },
+        { value: 'hollywood', label: 'Hollywood Smile & E-Max® Porcelain Veneers' },
+        { value: 'zirconia', label: 'German Zirconia Crowns & Full Rehabilitation' },
+        { value: 'implants', label: 'Dental Implants (All-on-4 / All-on-6)' },
+        { value: 'dental', label: 'General Dental Surgery & Cosmetic Dentistry' },
+        { value: 'whitening', label: 'Laser Teeth Whitening & Gum Aesthetics' },
+        { value: 'hair', label: 'Hair Transplantation (Sapphire FUE / DHI)' },
         { value: 'plastic', label: 'Plastic & Cosmetic Surgery' },
-        { value: 'spine', label: 'Spine Surgery' },
+        { value: 'spine', label: 'Spine & Orthopedic Surgery' },
       ],
-      message: 'Message (optional)',
-      messagePlaceholder: 'Tell us about your smile goals or preferred dates...',
-      consent: 'I agree to be contacted by ESTELUX regarding my consultation request.',
-      submit: 'Request my consultation',
-      submitting: 'Submitting...',
-      whatsappDirect: 'Chat directly on WhatsApp',
-      note: 'Complimentary online assessment • Direct Istanbul coordination',
+      message: 'Smile goals or questions (optional)',
+      messagePlaceholder: 'Tell us about your dental goals, number of teeth, or preferred travel dates...',
+      consent: 'I agree to be contacted by ESTELUX regarding my free medical consultation.',
+      submit: 'Get My Free Smile Assessment',
+      submitting: 'Preparing your request...',
+      whatsappDirect: 'Or Chat Instantly on WhatsApp',
+      note: '🔒 100% Confidential • No-Obligation Quote • Response in ~10 mins',
       errors: {
         name: 'Please enter your full name.',
-        phone: 'Please enter a valid WhatsApp number.',
-        country: 'Please enter your country.',
+        phone: 'Please enter a valid WhatsApp phone number.',
+        country: 'Please enter your country of residence.',
         email: 'Please enter a valid email address.',
         consent: 'Please confirm privacy consent to continue.',
       },
-      confirmTitle: 'Consultation request received',
+      confirmTitle: 'Consultation Request Received!',
       confirmBody:
-        'Thank you. Your request has been saved to our Istanbul coordinator desk. You can also send it directly on WhatsApp below for instant scheduling.',
-      confirmWaBtn: 'Send via WhatsApp now',
-      resetBtn: 'Submit another request',
-      waSummaryIntro: 'Hello ESTELUX, I would like to arrange a consultation.',
+        'Thank you. Your inquiry has been assigned to a senior Istanbul patient coordinator. Tap below to send your summary on WhatsApp for priority same-hour review.',
+      confirmWaBtn: 'Send on WhatsApp for Instant Reply',
+      resetBtn: 'Submit another inquiry',
+      waSummaryIntro: 'Hello ESTELUX Istanbul, I would like to receive my free consultation and treatment quote.',
       waFieldName: 'Name',
       waFieldPhone: 'WhatsApp',
       waFieldCountry: 'Country',
       waFieldEmail: 'Email',
-      waFieldService: 'Service',
+      waFieldService: 'Treatment',
+      waFieldTimeline: 'Timeline',
       waFieldNotes: 'Notes',
     },
     tourism: {
-      heading: 'Seamless Istanbul experience',
-      sub: 'Everything coordinated from arrival to follow-up.',
+      heading: '5-Star VIP Medical Travel Included',
+      sub: 'Everything coordinated from Istanbul Airport arrival to post-care follow-up.',
       items: [
         {
-          title: 'VIP TRANSFER',
-          desc: 'Private airport pickup and comfortable clinic transfers throughout your stay.',
+          title: 'VIP AIRPORT & CLINIC TRANSFER',
+          desc: 'Private Mercedes-Benz airport pickup and comfortable chauffeur transfers between your hotel and clinic.',
         },
         {
-          title: 'ACCOMMODATION',
-          desc: 'Carefully arranged hotel accommodation near our medical facilities in Istanbul.',
+          title: 'LUXURY 5-STAR ACCOMMODATION',
+          desc: 'Curated partner hotels located minutes away from our dental center in central Istanbul.',
         },
         {
-          title: 'BOOKING SERVICES',
-          desc: 'Complete medical appointment scheduling and personal coordination assistance.',
+          title: 'PERSONAL PATIENT CONCIERGE',
+          desc: 'Dedicated native-speaking translator and priority appointment scheduling throughout your stay.',
         },
       ],
     },
     services: {
-      kicker: 'ADDITIONAL SPECIALTIES',
-      heading: 'More medical services',
-      sub: 'Select a specialty below to pre-fill your consultation request.',
+      kicker: 'COMPREHENSIVE CARE IN ISTANBUL',
+      heading: 'Additional Medical Specialties',
+      sub: 'Beyond dental aesthetics, ESTELUX coordinates specialized surgical care with top accredited hospitals in Istanbul.',
       items: [
         {
           value: 'hair',
           title: 'Hair Transplantation',
-          desc: 'Personalized hair restoration procedures coordinated with specialized medical teams in Istanbul.',
-          linkText: 'Ask about hair transplantation',
+          desc: 'Maximum-density Sapphire FUE and DHI hair & beard restoration with natural hairline design and PRP therapy.',
+          linkText: 'Inquire about Hair Restoration',
         },
         {
           value: 'plastic',
           title: 'Plastic & Cosmetic Surgery',
-          desc: 'Aesthetic and reconstructive procedures tailored to natural, balanced results.',
-          linkText: 'Ask about cosmetic surgery',
+          desc: 'Rhinoplasty, facial rejuvenation, and body contouring performed by board-certified plastic surgeons.',
+          linkText: 'Inquire about Plastic Surgery',
         },
         {
           value: 'spine',
-          title: 'Spine Surgery',
-          desc: 'Specialized spinal assessment and surgical care supported by modern medical technology.',
-          linkText: 'Ask about spine surgery',
+          title: 'Spine & Orthopedic Surgery',
+          desc: 'Advanced minimally invasive spinal assessment and surgical care supported by modern hospital technology.',
+          linkText: 'Inquire about Spine Surgery',
         },
       ],
+    },
+    ctaBanner: {
+      kicker: 'START YOUR SMILE TRANSFORMATION',
+      heading: 'Ready to Discover Your New Smile in Istanbul?',
+      sub: 'Send us a quick message on WhatsApp or request your complimentary online assessment today. No obligation, transparent pricing.',
+      primaryBtn: 'Request Free Assessment',
+      waBtn: 'WhatsApp Us Now',
     },
     lightbox: {
       close: 'Close',
       prev: 'Previous case',
       next: 'Next case',
-      cta: 'Request consultation',
+      cta: 'Request Quote for Similar Smile',
     },
     footer: {
-      slogan: 'Look Beautiful, Live Healthy.',
+      slogan: 'Look Beautiful, Live Healthy — Istanbul, Türkiye.',
       whatsappLabel: 'WhatsApp',
       privacy: 'Privacy Policy',
       rights: `© ${new Date().getFullYear()} ESTELUX Istanbul. All rights reserved.`,
-      privacyTitle: 'Privacy Policy',
+      privacyTitle: 'Privacy & Medical Confidentiality Policy',
       privacyText:
-        'ESTELUX protects your personal and medical inquiry information. Details submitted in the consultation form are used solely to evaluate your request and coordinate your consultation in Istanbul. We never share your information with unauthorized third parties.',
+        'ESTELUX strictly protects your personal and medical inquiry information in accordance with international health data protection standards. Details and photos submitted are reviewed exclusively by our medical coordination team and dental surgeons to prepare your treatment plan and are never shared with third parties.',
       close: 'Close',
     },
     admin: {
@@ -408,11 +680,11 @@ const TRANSLATIONS = {
         deleteConfirm: 'Click again to confirm delete',
         deleteBtn: 'Delete',
         waReplyGreeting: (name: string, service: string) =>
-          `Hello ${name}, thank you for contacting ESTELUX Istanbul regarding ${service}. Our medical coordinator is ready to assist you.`,
+          `Hello ${name}, thank you for contacting ESTELUX Istanbul regarding ${service}. Our medical coordinator is ready to assist you with your treatment plan.`,
       },
       media: {
         brandSectionTitle: 'Brand Logo & Hero Banner Image',
-        brandSectionSub: 'Upload from your device or paste an image URL. Updates appear immediately on the landing page.',
+        brandSectionSub: 'Upload from your device (auto-optimized) or paste an image URL. Updates appear immediately on the landing page.',
         logoLabel: 'ESTELUX Brand Logo',
         heroPhotoLabel: 'Hero Featured Clinic Photo',
         uploadBtn: 'Upload File',
@@ -422,19 +694,19 @@ const TRANSLATIONS = {
         addCaseTitle: 'Add New Before & After Clinical Case',
         addCaseSub: 'Upload a clinical transformation photo and provide English & Arabic titles.',
         caseTitleEn: 'Title (English)',
-        caseTitleEnPh: 'e.g., Zirconia Crown Makeover',
+        caseTitleEnPh: 'e.g., 20 E-Max® Porcelain Veneers',
         caseTitleAr: 'Title (Arabic)',
-        caseTitleArPh: 'مثال: ابتسامة الزيركون الطبيعية',
+        caseTitleArPh: 'مثال: ٢٠ عدسة إيماكس خزفية',
         caseCategory: 'Category',
         catHollywood: 'Hollywood Smile',
-        catCosmetic: 'Cosmetic Dentistry',
+        catCosmetic: 'Cosmetic Dentistry / Crowns & Implants',
         caseCaptionEn: 'Short Description (English)',
         caseCaptionAr: 'Short Description (Arabic)',
         choosePhoto: 'Choose Photo from Device',
         orImageUrl: 'Or paste Image URL',
         addCaseBtn: 'Publish to Gallery',
         manageCasesTitle: 'Manage Clinical Gallery Cases',
-        manageCasesSub: 'Edit titles, toggle visibility on the landing page, reorder, or delete cases.',
+        manageCasesSub: 'Edit titles & descriptions, toggle visibility on the landing page, reorder, or delete cases.',
         visibleBadge: 'Visible on Site',
         hiddenBadge: 'Hidden',
         editBtn: 'Edit Details',
@@ -449,65 +721,280 @@ const TRANSLATIONS = {
   },
   ar: {
     brandSubtitle: 'تألّق بجمالك، وعِش بصحة',
+    topBar: {
+      accredited: 'مراكز طبية معتمدة دولياً (JCI & ISO) في إسطنبول',
+      materials: 'مواد ألمانية وسويسرية أصلية (Ivoclar E-Max® & Straumann®)',
+      warranty: 'ضمان دولي مكتوب لمدة ١٠ سنوات',
+      onlineNow: 'فريق التنسيق متاح الآن',
+    },
     nav: {
       homeAria: 'الصفحة الرئيسية ESTELUX',
       logoAlt: 'ESTELUX — تألّق بجمالك، وعِش بصحة',
-      allServices: 'جميع الخدمات',
+      treatments: 'علاجات الأسنان',
+      gallery: 'نتائج قبل وبعد',
+      whyUs: 'لماذا ESTELUX',
+      journey: 'رحلة العلاج',
+      reviews: 'آراء المرضى',
+      faq: 'الأسئلة الشائعة',
+      allServices: 'تخصصات أخرى',
+      freeQuote: 'استشارة مجانية',
       langSwitch: 'English',
       whatsapp: 'واتساب',
       whatsappAria: 'تواصل مع ESTELUX عبر واتساب',
       dashboardBtn: 'لوحة التحكم',
       backToSite: 'عرض صفحة الهبوط',
+      returnToAdmin: 'وضع الإدارة نشط — العودة إلى لوحة التحكم',
     },
     hero: {
-      kicker: 'التخصص الرئيسي • إسطنبول',
-      title: 'جراحة الأسنان وتجميلها',
+      kicker: 'الرائدون في طب الأسنان التجميلي • إسطنبول، تركيا',
+      responseBadge: 'معدل الرد عبر واتساب: أقل من ١٠ دقائق',
+      title: 'جراحة الأسنان وتصميم الابتسامة الفاخرة',
       subtitle: 'التميّز في الرعاية الطبية',
-      slogan: 'تألّق بجمالك، وعِش بصحة — التميّز في الرعاية الطبية.',
-      lead: 'اكتشف رعاية الأسنان المخصصة وطب الأسنان التجميلي في إسطنبول. بدءاً من الاستشارة الأولية عبر الإنترنت والتقييم الطبي، مروراً بتنسيق العلاج وحتى المتابعة بعد الإجراء، ترافقك ESTELUX في كل خطوة نحو ابتسامتك المثالية.',
-      whatsappCta: 'تواصل معنا عبر واتساب',
+      slogan: 'تألّق بجمالك، وعِش بصحة — دقة طب الأسنان الرقمي في إسطنبول.',
+      lead: 'احصل على ابتسامة هوليوود بعدسات الإيماكس الألمانية، وتيجان الزيركون، وزراعة الأسنان السويسرية في إسطنبول بتوفير يصل إلى ٧٠٪ مقارنة بأوروبا والخليج. بدءاً من التقييم المجاني عبر الإنترنت وحتى الاستقبال الخاص VIP من المطار والإقامة الفندقية الفاخرة، تنسّق ESTELUX كل تفاصيل رحلتك.',
+      primaryCta: 'احصل على خطة علاج مجانية',
+      whatsappCta: 'تحدث عبر واتساب',
       whatsappPrefill:
-        'مرحباً ESTELUX، أنا مهتم بخدمة جراحة الأسنان وتجميلها. أود الحصول على مزيد من المعلومات وترتيب موعد للاستشارة.',
+        'مرحباً ESTELUX إسطنبول، أرغب في الحصول على استشارة مجانية وعرض سعر لتجميل وعلاج الأسنان.',
       photoAlt: 'استشارة جراحة الأسنان وتجميلها في عيادة ESTELUX إسطنبول',
-      photoCaption: 'تصميم الابتسامة وتجميل الأسنان المخصص في إسطنبول',
-      resultsHeading: 'نتائج سريرية حقيقية قبل وبعد',
+      photoCaption: 'تصميم الابتسامة الرقمي ثلاثي الأبعاد وطب الأسنان التجميلي بدون ألم في إسطنبول',
+      metrics: [
+        { value: '+٥,٢٠٠', label: 'ابتسامة ناجحة' },
+        { value: '+١٥ سنة', label: 'خبرة الأطباء الجراحين' },
+        { value: 'حتى ٧٠٪', label: 'توفير في التكلفة' },
+        { value: '١٠ سنوات', label: 'ضمان دولي مكتوب' },
+      ],
+      resultsHeading: 'نتائج سريرية موثقة لابتسامات مرضانا',
+      resultsSub: 'تحولات حقيقية تم إنجازها خلال ٥ إلى ٧ أيام في إسطنبول. اضغط على أي صورة للتكبير.',
       resultsHint: 'انقر للتكبير',
-      verifiedBadge: 'حالة سريرية موثقة',
+      verifiedBadge: 'حالة موثقة',
       filters: {
         all: 'جميع الحالات',
         hollywood: 'هوليوود سمايل',
-        cosmetic: 'تجميل الأسنان',
+        cosmetic: 'زيركون وزراعة الأسنان',
       },
       casePrefix: 'حالة رقم ',
     },
+    treatmentsSection: {
+      kicker: 'باقات علاج وتجميل الأسنان',
+      heading: 'أحدث تقنيات تجميل وجراحة الأسنان في إسطنبول',
+      sub: 'نستخدم حصرياً مواد أوروبية معتمدة من FDA و CE مع شهادة ضمان دولية مكتوبة وخدمات استقبال VIP متكاملة.',
+      durationLabel: 'مدة الإقامة في إسطنبول:',
+      warrantyLabel: 'الضمان:',
+      ctaText: 'اطلب عرض سعر لهذا الإجراء',
+      items: [
+        {
+          value: 'hollywood',
+          image: '/case-hollywood-2.jpg',
+          badge: 'الأكثر طلباً',
+          title: 'هوليوود سمايل وعدسات إيماكس (E-Max®)',
+          stay: '٥ – ٧ أيام',
+          warranty: 'ضمان ١٠ سنوات',
+          desc: 'عدسات خزفية فائقة الرقة من Ivoclar Vivadent® الألمانية مصممة بتقنية التصميم الرقمي ثلاثي الأبعاد لشفافية طبيعية وتناسق مثالي مع الوجه.',
+          highlights: [
+            'بروفة رقمية وتجربة شكل الابتسامة قبل التركيب النهائي',
+            'خزف ألماني مقاوم للتصبغات بدرجات بياض طبيعية أو ناصعة',
+            'حفاظ فائق على طبقة المينا الصحية بأقل برد ممكن',
+          ],
+        },
+        {
+          value: 'zirconia',
+          image: '/case-cosmetic-1.jpg',
+          badge: 'تأهيل شامل',
+          title: 'تيجان الزيركون الألماني وتجميل الأسنان',
+          stay: '٥ – ٧ أيام',
+          warranty: 'ضمان ١٠ سنوات',
+          desc: 'تيجان زيركونيا ألمانية متعددة الطبقات تجمع بين القوة الفائقة لتحمل المضغ والمظهر الطبيعي الشفاف للأسنان.',
+          highlights: [
+            'زيركون حيوي خالٍ تماماً من المعادن ومصنع بتقنية CAD/CAM',
+            'مثالي لتعويض الأسنان المتضررة أو الجسور المتكاملة',
+            'مسح رقمي ثلاثي الأبعاد للفم بدون طبعات تقليدية مزعجة',
+          ],
+        },
+        {
+          value: 'implants',
+          image: '/case-cosmetic-2.jpg',
+          badge: 'حل دائم مدى الحياة',
+          title: 'زراعة الأسنان وتعويض الأسنان المفقودة',
+          stay: '٣ – ٥ أيام لكل مرحلة',
+          warranty: 'ضمان مدى الحياة للزرعات',
+          desc: 'زرعات تيتانيوم سويسرية وألمانية يتم وضعها بتوجيه ثلاثي الأبعاد (3D CBCT) لتعويض الأسنان المفقودة أو الفك بالكامل.',
+          highlights: [
+            'أنظمة Straumann® و Nobel Biocare® العالمية المعتمدة',
+            'تركيب أسنان مؤقتة ثابتة فوراً خلال نفس الزيارة',
+            'إجراء غير مؤلم تحت التخدير الموضعي الرقمي أو التهدئة',
+          ],
+        },
+        {
+          value: 'dental',
+          image: '/case-hollywood-1.jpg',
+          badge: 'تصميم متكامل للابتسامة',
+          title: 'ترميم الابتسامة وتصحيح الإطباق التجميلي',
+          stay: '٥ – ٧ أيام',
+          warranty: 'ضمان ١٠ سنوات',
+          desc: 'علاج تجميلي وتعويضي متكامل لإغلاق الفراغات وتصحيح تآكل الأسنان وتناسق اللثة في رحلة علاجية واحدة.',
+          highlights: [
+            'تصميم مخصص لشكل ولون الأسنان بما يناسب ملامح الوجه',
+            'تحديد وتوريد اللثة بالليزر لإبراز جمال الابتسامة',
+            'يشمل الأشعة البانورامية والمسح ثلاثي الأبعاد 3D CBCT',
+          ],
+        },
+      ],
+    },
+    whyUs: {
+      kicker: 'معايير ESTELUX الطبية',
+      heading: 'لماذا يختار المرضى الدوليون عيادة ESTELUX؟',
+      sub: 'نجمع بين نخبة استشاريي تجميل الأسنان وخدمات الضيافة الفاخرة من فئة ٥ نجوم في قلب إسطنبول.',
+      items: [
+        {
+          title: 'معاينة واعتماد ابتسامتك قبل التثبيت',
+          desc: 'من خلال المسح الرقمي ثلاثي الأبعاد والنموذج التجريبي (Mock-up)، يمكنك رؤية وتجربة شكل ولون أسنانك الجديدة والموافقة عليها قبل التثبيت النهائي.',
+        },
+        {
+          title: 'مواد أوروبية أصلية ١٠٠٪ بشهادة رقم تسلسلي',
+          desc: 'تأتي كل عدسة وتاج وزرعة مع بطاقة أصالة رسمية برقم تسلسلي من شركات Ivoclar Vivadent® و Straumann® و Nobel Biocare®.',
+        },
+        {
+          title: 'باقات شاملة بأسعار واضحة بدون رسوم خفية',
+          desc: 'يشمل عرض السعر تصوير الأشعة البانورامية والمقطعية 3D CBCT، والأسنان المؤقتة، والأدوية، واستقبال المطار VIP، وتنسيق الفندق بدون أي تكاليف إضافية.',
+        },
+        {
+          title: 'مرافق ومترجم شخصي يتحدث لغتك ٢٤/٧',
+          desc: 'يرافقك منسق شخصي يتحدث العربية أو الإنجليزية أو الألمانية في جميع مواعيدك الطبية لضمان راحتك التامة.',
+        },
+      ],
+    },
+    journey: {
+      kicker: 'خطوات بسيطة وواضحة',
+      heading: 'رحلة ابتسامتك في إسطنبول في ٤ خطوات',
+      sub: 'من رسالتك الأولى عبر واتساب وحتى عودتك بابتسامتك الجديدة، نرتب لك كل شيء بدقة واحترافية.',
+      steps: [
+        {
+          num: '٠١',
+          title: 'تقييم طبي مجاني عبر الإنترنت',
+          desc: 'أرسل صور أسنانك أو صورة أشعة عبر واتساب أو النموذج. يقوم أطباؤنا بإعداد خطة علاج مفصلة وعرض سعر ثابت خلال ٢٤ ساعة.',
+        },
+        {
+          num: '٠٢',
+          title: 'استقبال VIP من المطار وإقامة ٥ نجوم',
+          desc: 'فور وصولك إلى مطار إسطنبول، يستقبلك سائقنا الخاص بسيارة VIP فاخرة ليقلك إلى فندقك والعيادة في جميع مواعيدك.',
+        },
+        {
+          num: '٠٣',
+          title: 'التصميم الرقمي ثلاثي الأبعاد والعلاج',
+          desc: 'نجري فحص 3D CBCT، ونصمم ابتسامتك رقمياً، ونركب الأسنان المؤقتة في اليوم الأول بينما يصنع مختبرنا الرقمي تركيباتك النهائية.',
+        },
+        {
+          num: '٠٤',
+          title: 'التركيب النهائي وشهادة الضمان الدولي',
+          desc: 'بعد التأكد من دقة الإطباق وجمال الابتسامة، تتسلم شهادة الضمان الرسمية لمدة ١٠ سنوات / مدى الحياة مع متابعة طبية مستمرة.',
+        },
+      ],
+    },
+    reviews: {
+      kicker: 'تجارب حقيقية لمرضانا',
+      heading: 'ثقة المرضى من الخليج وأوروبا',
+      sub: 'اطلع على تجارب المرضى الذين اختاروا ESTELUX إسطنبول لتجميل وزراعة الأسنان.',
+      verifiedLabel: 'مراجع موثق',
+      items: [
+        {
+          name: 'فيصل الحربي',
+          country: 'الرياض، السعودية 🇸🇦',
+          treatment: 'تيجان الزيركون الألماني للفكين',
+          quote:
+            'المنسق الطبي رافقني منذ وصولي مطار إسطنبول وحتى انتهاء العلاج. العيادة حديثة جداً والنتيجة طبيعية للغاية وتمت خلال ٦ أيام فقط.',
+        },
+        {
+          name: 'ماركوس هـ.',
+          country: 'ميونخ، ألمانيا 🇩🇪',
+          treatment: '٢٠ عدسة إيماكس (هوليوود سمايل)',
+          quote:
+            'في ألمانيا طلبوا مني أكثر من ١٦ ألف يورو. في ESTELUX حصلت على نفس عدسات الإيماكس السويسرية/الألمانية الأصلية مع إقامة فندقية ٥ نجوم وبأقل من ثلث التكلفة.',
+        },
+        {
+          name: 'سيارا دويل',
+          country: 'دبلن، أيرلندا 🇮🇪',
+          treatment: 'هوليوود سمايل وتجميل اللثة بالليزر',
+          quote:
+            'تنظيم رائع من الاستقبال في المطار وحتى الجلسة النهائية. لم أشعر بأي ألم، وأعجبني أنني شاهدت شكل الأسنان التجريبي قبل التركيب الدائم.',
+        },
+        {
+          name: 'شارلوت إيفانز',
+          country: 'لندن، المملكة المتحدة 🇬🇧',
+          treatment: 'زراعة الأسنان السويسرية وتيجان الخزف',
+          quote:
+            'كنت مترددة بشأن السفر لعلاج الأسنان، لكن الجراح شرح لي الأشعة ثلاثية الأبعاد بالتفصيل وسلمني شهادة ضمان دولية مكتوبة. أفضل قرار اتخذته.',
+        },
+      ],
+    },
+    faq: {
+      kicker: 'الأسئلة الشائعة',
+      heading: 'كل ما تود معرفته قبل السفر إلى إسطنبول',
+      sub: 'هل لديك سؤال آخر؟ تواصل مع منسقينا الطبيين مباشرة عبر واتساب للحصول على إجابة فورية.',
+      items: [
+        {
+          q: 'كم يوماً أحتاج للإقامة في إسطنبول لإجراء هوليوود سمايل أو تيجان الزيركون؟',
+          a: 'لإجراء عدسات الإيماكس (E-Max®) أو تيجان الزيركون الألماني، تكفي إقامة لمدة ٥ إلى ٧ أيام في إسطنبول، تتخللها ٣ إلى ٤ زيارات مريحة للعيادة مع وقت كافٍ للاستمتاع بالمدينة.',
+        },
+        {
+          q: 'كم تستغرق عملية زراعة الأسنان؟',
+          a: 'تتطلب المرحلة الأولى لزراعة الأسنان وتركيب الأسنان المؤقتة زيارة لمدة ٣ إلى ٥ أيام فقط. وبعد التئام العظم مع الزرعة (من ٣ إلى ٤ أشهر)، تعود في زيارة ثانية لمدة ٥ إلى ٦ أيام لتركيب التيجان الدائمة.',
+        },
+        {
+          q: 'هل الإجراءات مؤلمة؟',
+          a: 'إطلاقاً. جميع العلاجات تتم تحت التخدير الموضعي الرقمي الحديث (مع توفر خيار التهدئة عند الطلب) لضمان عدم الشعور بأي ألم أثناء التحضير أو التركيب.',
+        },
+        {
+          q: 'هل تقدمون ضماناً مكتوباً على العدسات والتيجان والزراعة؟',
+          a: 'نعم، يحصل كل مراجع على شهادة ضمان رسمية مكتوبة من ESTELUX بالإضافة إلى بطاقات الرقم التسلسلي الأصلية، وتشمل ضمان ١٠ سنوات لعدسات الإيماكس والزيركون، وضمان مدى الحياة لزرعات التيتانيوم.',
+        },
+        {
+          q: 'كيف أحصل على التكلفة الدقيقة وخطة العلاج قبل حجز الطيران؟',
+          a: 'فقط أرسل طلبك عبر النموذج في هذه الصفحة أو راسلنا عبر واتساب مع صور واضحة لأسنانك (أو صورة أشعة بانورامية إن وجدت). سيقوم أطباؤنا بدراسة حالتك مجاناً وإرسال خطة علاج مفصلة وواضحة.',
+        },
+        {
+          q: 'ماذا تشمل خدمات الاستقبال VIP والإقامة الفندقية؟',
+          a: 'نرتب لك الاستقبال والتوديع من مطار إسطنبول بسيارات VIP خاصة، وجميع التنقلات بين الفندق والعيادة، وحجز فندق ٥ نجوم قريب من المركز الطبي، ومترجم شخصي مرافق لك.',
+        },
+      ],
+    },
     form: {
-      heading: 'اطلب استشارة طبية',
-      intro: 'اترك بياناتك ليتواصل معك فريق التنسيق في إسطنبول ويجهز خطتك العلاجية المخصصة.',
+      badge: 'تقييم طبي مجاني ١٠٠٪ عبر الإنترنت',
+      heading: 'اطلب خطة علاجك المجانية',
+      intro: 'اترك بياناتك ليتواصل معك فريق التنسيق في إسطنبول ويجهز خطتك العلاجية المخصصة مع التكلفة التقديرية.',
+      timelineLabel: 'متى تخطط لإجراء العلاج؟',
+      timelines: [
+        { value: 'As soon as possible', label: 'في أقرب وقت ممكن' },
+        { value: 'Within 1–3 months', label: 'خلال ١ – ٣ أشهر' },
+        { value: 'Just researching / price check', label: 'استفسار عن الأسعار' },
+      ],
       countryCodeAria: 'رمز الدولة الدولي',
       fullName: 'الاسم الكامل',
       fullNamePlaceholder: 'أدخل اسمك الكامل',
       whatsapp: 'رقم الواتساب',
       whatsappPlaceholder: '5XX XXX XXXX',
       country: 'بلد الإقامة',
-      countryPlaceholder: 'مثال: السعودية، الإمارات، الكويت',
+      countryPlaceholder: 'مثال: السعودية، الإمارات، ألمانيا، بريطانيا',
       email: 'البريد الإلكتروني (اختياري)',
       emailPlaceholder: 'you@example.com',
-      serviceLabel: 'الخدمة المطلوبة',
+      serviceLabel: 'الإجراء المطلوب',
       services: [
-        { value: 'dental', label: 'جراحة الأسنان وتجميلها' },
-        { value: 'hollywood', label: 'هوليوود سمايل وعدسات الأسنان' },
-        { value: 'implants', label: 'زراعة الأسنان وجراحة الفم' },
-        { value: 'hair', label: 'زراعة الشعر' },
+        { value: 'hollywood', label: 'هوليوود سمايل وعدسات إيماكس (E-Max®)' },
+        { value: 'zirconia', label: 'تيجان الزيركون الألماني وتأهيل الفكين' },
+        { value: 'implants', label: 'زراعة الأسنان السويسرية (All-on-4 / All-on-6)' },
+        { value: 'dental', label: 'جراحة الأسنان وتجميلها الشامل' },
+        { value: 'whitening', label: 'تبييض الأسنان بالليزر وتجميل اللثة' },
+        { value: 'hair', label: 'زراعة الشعر (Sapphire FUE / DHI)' },
         { value: 'plastic', label: 'الجراحة التجميلية والترميمية' },
-        { value: 'spine', label: 'جراحة العمود الفقري' },
+        { value: 'spine', label: 'جراحة العمود الفقري والعظام' },
       ],
-      message: 'رسالتك (اختياري)',
-      messagePlaceholder: 'أخبرنا عن أهداف ابتسامتك أو الموعد المناسب لك...',
-      consent: 'أوافق على تواصل ESTELUX معي بخصوص طلب الاستشارة الطبية.',
-      submit: 'اطلب استشارتي الآن',
-      submitting: 'جاري الإرسال...',
-      whatsappDirect: 'تحدث مباشرة عبر واتساب',
-      note: 'تقييم مجاني عبر الإنترنت • تنسيق مباشر في إسطنبول',
+      message: 'تفاصيل إضافية أو استفسارك (اختياري)',
+      messagePlaceholder: 'أخبرنا عن أهداف ابتسامتك أو عدد الأسنان أو الموعد المناسب للسفر...',
+      consent: 'أوافق على تواصل ESTELUX معي بخصوص طلب الاستشارة الطبية المجانية.',
+      submit: 'احصل على تقييمي المجاني الآن',
+      submitting: 'جاري إرسال طلبك...',
+      whatsappDirect: 'أو تحدث فوراً عبر واتساب',
+      note: '🔒 سرية تامة ١٠٠٪ • استشارة مجانية بدون التزام • رد خلال ١٠ دقائق',
       errors: {
         name: 'يرجى إدخال الاسم الكامل.',
         phone: 'يرجى إدخال رقم واتساب صحيح.',
@@ -515,76 +1002,84 @@ const TRANSLATIONS = {
         email: 'يرجى إدخال بريد إلكتروني صحيح.',
         consent: 'يرجى الموافقة للمتابعة.',
       },
-      confirmTitle: 'تم استلام طلب الاستشارة بنجاح',
+      confirmTitle: 'تم استلام طلب الاستشارة بنجاح!',
       confirmBody:
-        'شكراً لك. تم حفظ طلبك وإرساله إلى لوحة تنسيق المرضى في إسطنبول. يمكنك أيضاً إرساله مباشرة عبر واتساب أدناه لتأكيد الموعد فوراً.',
-      confirmWaBtn: 'أرسل عبر واتساب الآن',
-      resetBtn: 'إرسال طلب جديد',
-      waSummaryIntro: 'مرحباً ESTELUX، أرغب في ترتيب موعد لاستشارة طبية.',
+        'شكراً لك. تم تحويل طلبك إلى منسق المرضى في إسطنبول. اضغط أدناه لإرسال ملخص طلبك مباشرة عبر واتساب للحصول على أولوية الرد الفوري.',
+      confirmWaBtn: 'أرسل عبر واتساب للرد الفوري',
+      resetBtn: 'إرسال طلب استشارة آخر',
+      waSummaryIntro: 'مرحباً ESTELUX إسطنبول، أرغب في الحصول على استشارة مجانية وخطة علاج.',
       waFieldName: 'الاسم',
       waFieldPhone: 'رقم الواتساب',
       waFieldCountry: 'بلد الإقامة',
       waFieldEmail: 'البريد الإلكتروني',
-      waFieldService: 'الخدمة المطلوبة',
+      waFieldService: 'الإجراء المطلوب',
+      waFieldTimeline: 'الموعد المقترح',
       waFieldNotes: 'ملاحظات',
     },
     tourism: {
-      heading: 'تجربة متكاملة في إسطنبول',
-      sub: 'تنسيق مريح من لحظة وصولك وحتى المتابعة.',
+      heading: 'خدمات سياحة علاجية VIP من فئة ٥ نجوم',
+      sub: 'تنسيق مريح ومتكامل من لحظة وصولك مطار إسطنبول وحتى المتابعة بعد العودة.',
       items: [
         {
-          title: 'نقل VIP خاص',
-          desc: 'استقبال خاص من المطار وتنقلات مريحة بين الفندق والعيادة طوال إقامتك.',
+          title: 'استقبال وتنقلات VIP خاصة',
+          desc: 'استقبال خاص من المطار بسيارات مرسيدس VIP وتنقلات مريحة بين الفندق والعيادة طوال إقامتك.',
         },
         {
-          title: 'إقامة فندقية مريحة',
-          desc: 'ترتيبات إقامة فندقية مريحة ومختارة بعناية بالقرب من مراكزنا الطبية في إسطنبول.',
+          title: 'إقامة فندقية فاخرة ٥ نجوم',
+          desc: 'ترتيبات إقامة في فنادق فاخرة مختارة بعناية على بُعد دقائق من مركزنا الطبي في إسطنبول.',
         },
         {
-          title: 'خدمات الحجز والتنسيق',
-          desc: 'تنسيق كامل للمواعيد الطبية ومساعدة شخصية في جميع الحجوزات.',
+          title: 'منسق ومترجم شخصي مرافق',
+          desc: 'تنسيق كامل للمواعيد الطبية ومرافقة شخصيةبلغتك الأم في جميع خطوات العلاج.',
         },
       ],
     },
     services: {
-      kicker: 'تخصصات طبية إضافية',
-      heading: 'خدمات طبية أخرى',
-      sub: 'اختر التخصص أدناه لتحديده تلقائياً في نموذج الاستشارة.',
+      kicker: 'رعاية طبية متكاملة في إسطنبول',
+      heading: 'تخصصات طبية وجراحية إضافية',
+      sub: 'إلى جانب طب الأسنان التجميلي، تنسق ESTELUX إجراءات جراحية متخصصة في أفضل المستشفيات المعتمدة في إسطنبول.',
       items: [
         {
           value: 'hair',
-          title: 'زراعة الشعر',
-          desc: 'إجراءات حديثة لاستعادة الشعر بالتنسيق مع نخبة من الفرق الطبية المتخصصة في إسطنبول.',
+          title: 'زراعة الشعر الطبيعي',
+          desc: 'تقنيات السفير FUE وأقلام تشوي DHI لزراعة الشعر واللحية بكثافة قصوى وخط مقدمة طبيعي.',
           linkText: 'استفسر عن زراعة الشعر',
         },
         {
           value: 'plastic',
           title: 'الجراحة التجميلية والترميمية',
-          desc: 'إجراءات تجميلية وترميمية مخصصة تركز على النتائج الطبيعية والمتناسقة.',
+          desc: 'تجميل الأنف، شد الوجه، ونحت القوام بإشراف نخبة من جراحي التجميل المعتمدين.',
           linkText: 'استفسر عن الجراحة التجميلية',
         },
         {
           value: 'spine',
-          title: 'جراحة العمود الفقري',
-          desc: 'تقييم متخصص ورعاية جراحية للعمود الفقري مدعومة بأحدث التقنيات الطبية.',
+          title: 'جراحة العمود الفقري والعظام',
+          desc: 'تشخيص دقيق وجراحات طفيفة التوغل للعمود الفقري والمفاصل بأحدث التقنيات الطبية.',
           linkText: 'استفسر عن جراحة العمود الفقري',
         },
       ],
+    },
+    ctaBanner: {
+      kicker: 'ابدأ رحلة ابتسامتك الجديدة',
+      heading: 'هل أنت مستعد لتصميم ابتسامتك المثالية في إسطنبول؟',
+      sub: 'تواصل معنا عبر واتساب أو اطلب تقييمك الطبي المجاني اليوم. أسعار واضحة وخدمة VIP متكاملة.',
+      primaryBtn: 'اطلب تقييمك المجاني',
+      waBtn: 'راسلنا عبر واتساب الآن',
     },
     lightbox: {
       close: 'إغلاق',
       prev: 'الحالة السابقة',
       next: 'الحالة التالية',
-      cta: 'اطلب استشارة طبية',
+      cta: 'اطلب استشارة لابتسامة مماثلة',
     },
     footer: {
-      slogan: 'تألّق بجمالك، وعِش بصحة.',
+      slogan: 'تألّق بجمالك، وعِش بصحة — إسطنبول، تركيا.',
       whatsappLabel: 'واتساب',
       privacy: 'سياسة الخصوصية',
       rights: `© ${new Date().getFullYear()} ESTELUX إسطنبول. جميع الحقوق محفوظة.`,
-      privacyTitle: 'سياسة الخصوصية',
+      privacyTitle: 'سياسة الخصوصية والسرية الطبية',
       privacyText:
-        'تحترم ESTELUX خصوصيتك وتحافظ على سرية بياناتك الطبية والشخصية. تُستخدم المعلومات المقدمة في نموذج الاستشارة حصرياً لتقييم طلبك وتنسيق استشارتك في إسطنبول ولا يتم مشاركتها مع أي أطراف خارجية.',
+        'تحترم ESTELUX خصوصيتك وتحافظ على سرية بياناتك الطبية والشخصية وفق أعلى المعايير الدولية. تُستخدم المعلومات والصور المقدمة حصرياً من قبل الفريق الطبي لتقييم حالتك وإعداد خطة علاجك في إسطنبول ولا يتم مشاركتها مع أي أطراف خارجية.',
       close: 'إغلاق',
     },
     admin: {
@@ -637,11 +1132,11 @@ const TRANSLATIONS = {
         deleteConfirm: 'اضغط مرة أخرى لتأكيد الحذف',
         deleteBtn: 'حذف',
         waReplyGreeting: (name: string, service: string) =>
-          `مرحباً ${name}، شكراً لتواصلك مع ESTELUX إسطنبول بخصوص خدمة (${service}). فريق التنسيق الطبي جاهز لمساعدتك وتزويدك بكافة التفاصيل.`,
+          `مرحباً ${name}، شكراً لتواصلك مع ESTELUX إسطنبول بخصوص خدمة (${service}). فريق التنسيق الطبي جاهز لمساعدتك وتزويدك بخطة العلاج والتفاصيل.`,
       },
       media: {
         brandSectionTitle: 'تعديل شعار العلامة التجارية وصورة الواجهة الرئيسية',
-        brandSectionSub: 'ارفع صورة من جهازك أو الصق رابط صورة مباشر. تظهر التعديلات فوراً في صفحة الهبوط.',
+        brandSectionSub: 'ارفع صورة من جهازك (يتم ضغطها تلقائياً) أو الصق رابط صورة مباشر. تظهر التعديلات فوراً في صفحة الهبوط.',
         logoLabel: 'شعار ESTELUX الرسمي',
         heroPhotoLabel: 'الصورة الرئيسية للعيادة في الواجهة',
         uploadBtn: 'رفع صورة من الجهاز',
@@ -649,21 +1144,21 @@ const TRANSLATIONS = {
         applyUrl: 'تطبيق',
         resetDefaults: 'استعادة جميع الصور الافتراضية',
         addCaseTitle: 'إضافة حالة قبل وبعد جديدة إلى المعرض',
-        addCaseSub: 'ارفع صورة الحالة وأدخل العنوان باللغتين العربية والإنجليزية.',
+        addCaseSub: 'ارفع صورة الحالة وأدخل العنوان والوصف باللغتين العربية والإنجليزية.',
         caseTitleEn: 'العنوان (بالإنجليزية)',
-        caseTitleEnPh: 'مثال: Zirconia Crown Makeover',
+        caseTitleEnPh: 'مثال: 20 E-Max® Porcelain Veneers',
         caseTitleAr: 'العنوان (بالعربية)',
-        caseTitleArPh: 'مثال: ابتسامة الزيركون الطبيعية',
+        caseTitleArPh: 'مثال: ٢٠ عدسة إيماكس خزفية',
         caseCategory: 'التصنيف',
         catHollywood: 'هوليوود سمايل',
-        catCosmetic: 'تجميل الأسنان',
+        catCosmetic: 'تجميل الأسنان / زيركون وزراعة',
         caseCaptionEn: 'وصف مختصر (بالإنجليزية)',
         caseCaptionAr: 'وصف مختصر (بالعربية)',
         choosePhoto: 'اختر صورة من جهازك',
         orImageUrl: 'أو الصق رابط الصورة',
         addCaseBtn: 'نشر الصورة في المعرض',
         manageCasesTitle: 'التحكم في صور الحالات السريرية الحالية',
-        manageCasesSub: 'تعديل العناوين، إظهار أو إخفاء الصورة في الصفحة، تغيير الترتيب، أو الحذف.',
+        manageCasesSub: 'تعديل العناوين والوصف، إظهار أو إخفاء الصورة في الصفحة، تغيير الترتيب، أو الحذف.',
         visibleBadge: 'ظاهرة في الموقع',
         hiddenBadge: 'مخفية',
         editBtn: 'تعديل البيانات',
@@ -683,6 +1178,9 @@ const toArabicDigits = (num: number | string) =>
 
 export function App() {
   const [lang, setLang] = useState<Language>('en');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
+
   const isSecretAdminUrl = () => {
     if (typeof window === 'undefined') return false;
     const hash = window.location.hash.toLowerCase();
@@ -690,14 +1188,29 @@ export function App() {
     return hash === '#admin' || hash.startsWith('#admin/') || params.get('admin') === '1';
   };
 
-  const [view, setView] = useState<ViewMode>(() => (isSecretAdminUrl() ? 'login' : 'landing'));
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    try {
+      return sessionStorage.getItem(STORAGE_KEYS.adminSession) === '1';
+    } catch {
+      return false;
+    }
+  });
+
+  const [view, setView] = useState<ViewMode>(() => {
+    if (!isSecretAdminUrl()) return 'landing';
+    try {
+      return sessionStorage.getItem(STORAGE_KEYS.adminSession) === '1' ? 'admin' : 'login';
+    } catch {
+      return 'login';
+    }
+  });
+
   const [adminTab, setAdminTab] = useState<AdminTab>('leads');
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [adminPin, setAdminPin] = useState<string>(() => {
     try {
-      return localStorage.getItem(STORAGE_KEYS.adminPin) || DEFAULT_ADMIN_PIN;
+      return localStorage.getItem(STORAGE_KEYS.adminPin) || ENV_ADMIN_PIN;
     } catch {
-      return DEFAULT_ADMIN_PIN;
+      return ENV_ADMIN_PIN;
     }
   });
   const [pinInput, setPinInput] = useState('');
@@ -723,7 +1236,14 @@ export function App() {
   const [dentalCases, setDentalCases] = useState<DentalCase[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEYS.cases);
-      return saved ? JSON.parse(saved) : INITIAL_CASES;
+      if (!saved) return INITIAL_CASES;
+      const parsed: DentalCase[] = JSON.parse(saved);
+      // Sanitize any legacy broken file paths
+      return parsed.map((c, idx) =>
+        BROKEN_LEGACY_FILES.has(c.src)
+          ? { ...c, src: INITIAL_CASES[idx % INITIAL_CASES.length].src }
+          : c
+      );
     } catch {
       return INITIAL_CASES;
     }
@@ -731,7 +1251,9 @@ export function App() {
 
   const [brandLogo, setBrandLogo] = useState<string>(() => {
     try {
-      return localStorage.getItem(STORAGE_KEYS.logo) || DEFAULT_ASSETS.logo;
+      const saved = localStorage.getItem(STORAGE_KEYS.logo);
+      if (!saved || BROKEN_LEGACY_FILES.has(saved)) return DEFAULT_ASSETS.logo;
+      return saved;
     } catch {
       return DEFAULT_ASSETS.logo;
     }
@@ -752,9 +1274,10 @@ export function App() {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Consultation Form State
-  const [selectedServiceValue, setSelectedServiceValue] = useState<string>('dental');
+  const [selectedServiceValue, setSelectedServiceValue] = useState<string>('hollywood');
+  const [selectedTimeline, setSelectedTimeline] = useState<string>('As soon as possible');
   const [fullName, setFullName] = useState('');
-  const [countryCode, setCountryCode] = useState('+90');
+  const [countryCode, setCountryCode] = useState('+49');
   const [phone, setPhone] = useState('');
   const [country, setCountry] = useState('');
   const [email, setEmail] = useState('');
@@ -764,6 +1287,7 @@ export function App() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [lastSubmittedLead, setLastSubmittedLead] = useState<ConsultationLead | null>(null);
+  const fullNameInputRef = useRef<HTMLInputElement | null>(null);
 
   // Admin Dashboard Controls State
   const [leadSearch, setLeadSearch] = useState('');
@@ -787,7 +1311,7 @@ export function App() {
     setToastMessage(msg);
     setTimeout(() => {
       setToastMessage((prev) => (prev === msg ? null : prev));
-    }, 2600);
+    }, 2800);
   };
 
   useEffect(() => {
@@ -837,7 +1361,7 @@ export function App() {
   useEffect(() => {
     const syncRoute = () => {
       if (isSecretAdminUrl()) {
-        setView((prev) => (prev === 'admin' ? 'admin' : 'login'));
+        setView(isAuthenticated ? 'admin' : 'login');
       } else {
         setView('landing');
       }
@@ -848,7 +1372,16 @@ export function App() {
       window.removeEventListener('hashchange', syncRoute);
       window.removeEventListener('popstate', syncRoute);
     };
-  }, []);
+  }, [isAuthenticated]);
+
+  // Lock body scroll when any modal is open
+  useEffect(() => {
+    const hasModal = lightboxIndex !== null || privacyOpen || pinModalOpen;
+    document.body.style.overflow = hasModal ? 'hidden' : '';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [lightboxIndex, privacyOpen, pinModalOpen]);
 
   const exitToLandingPage = () => {
     if (typeof window !== 'undefined') {
@@ -856,6 +1389,13 @@ export function App() {
       window.history.replaceState(null, '', cleanUrl);
     }
     setView('landing');
+  };
+
+  const openAdminPortal = () => {
+    if (typeof window !== 'undefined') {
+      window.history.replaceState(null, '', '#admin');
+    }
+    setView(isAuthenticated ? 'admin' : 'login');
   };
 
   // Visible cases for public landing page
@@ -874,29 +1414,50 @@ export function App() {
 
   const newLeadsCount = leads.filter((l) => l.status === 'new').length;
 
+  // Global keyboard shortcuts for modals & lightbox
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      if (lightboxIndex === null) return;
-      if (e.key === 'Escape') setLightboxIndex(null);
+      if (e.key === 'Escape') {
+        if (lightboxIndex !== null) setLightboxIndex(null);
+        if (privacyOpen) setPrivacyOpen(false);
+        if (pinModalOpen) setPinModalOpen(false);
+        if (mobileMenuOpen) setMobileMenuOpen(false);
+        return;
+      }
+      if (lightboxIndex === null || filteredCases.length === 0) return;
       if (e.key === 'ArrowRight') {
-        setLightboxIndex((prev) => (prev === null ? null : (prev + 1) % filteredCases.length));
+        setLightboxIndex((prev) =>
+          prev === null
+            ? null
+            : isRTL
+              ? (prev - 1 + filteredCases.length) % filteredCases.length
+              : (prev + 1) % filteredCases.length
+        );
       }
       if (e.key === 'ArrowLeft') {
         setLightboxIndex((prev) =>
-          prev === null ? null : (prev - 1 + filteredCases.length) % filteredCases.length
+          prev === null
+            ? null
+            : isRTL
+              ? (prev + 1) % filteredCases.length
+              : (prev - 1 + filteredCases.length) % filteredCases.length
         );
       }
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [lightboxIndex, filteredCases.length]);
+  }, [lightboxIndex, privacyOpen, pinModalOpen, mobileMenuOpen, filteredCases.length, isRTL]);
 
   const handleSelectServiceAndScroll = (serviceValue: string) => {
     setSelectedServiceValue(serviceValue);
     setSubmitted(false);
+    setMobileMenuOpen(false);
     const el = document.getElementById('consultation');
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setTimeout(() => {
+        fullNameInputRef.current?.focus({ preventScroll: true });
+      }, 500);
     }
   };
 
@@ -927,6 +1488,7 @@ export function App() {
       country: country.trim(),
       email: email.trim(),
       serviceValue: selectedServiceValue,
+      timeline: selectedTimeline,
       message: message.trim(),
       status: 'new',
       adminNotes: '',
@@ -944,7 +1506,7 @@ export function App() {
       setCountry('');
       setEmail('');
       setMessage('');
-    }, 450);
+    }, 380);
   };
 
   const buildWhatsAppLinkFromLead = (lead: ConsultationLead) => {
@@ -959,6 +1521,7 @@ export function App() {
       `${t.form.waFieldCountry}: ${lead.country}`,
       lead.email ? `${t.form.waFieldEmail}: ${lead.email}` : null,
       `${t.form.waFieldService}: ${serviceLabel}`,
+      lead.timeline ? `${t.form.waFieldTimeline}: ${lead.timeline}` : null,
       lead.message ? `${t.form.waFieldNotes}: ${lead.message}` : null,
     ]
       .filter(Boolean)
@@ -972,26 +1535,85 @@ export function App() {
   const getServiceLabel = (serviceValue: string) =>
     t.form.services.find((s) => s.value === serviceValue)?.label || serviceValue;
 
-  // Image File Reader Helper (converts uploaded image to Data URL for immediate live preview & storage)
+  // Client-side image compression + reader so uploaded photos fit comfortably in localStorage
   const handleImageFileUpload = (
     file: File | undefined,
-    callback: (dataUrl: string) => void
+    callback: (dataUrl: string) => void,
+    preserveTransparency = false
   ) => {
     if (!file) return;
+    if (file.type === 'image/svg+xml') {
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (typeof reader.result === 'string') callback(reader.result);
+      };
+      reader.readAsDataURL(file);
+      return;
+    }
+
     const reader = new FileReader();
     reader.onload = () => {
-      if (typeof reader.result === 'string') {
-        callback(reader.result);
-      }
+      if (typeof reader.result !== 'string') return;
+      const img = new Image();
+      img.onload = () => {
+        const maxDim = 1280;
+        let { width, height } = img;
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          callback(reader.result as string);
+          return;
+        }
+        ctx.drawImage(img, 0, 0, width, height);
+        const mime = preserveTransparency ? 'image/png' : 'image/jpeg';
+        const compressed = canvas.toDataURL(mime, 0.82);
+        callback(compressed);
+      };
+      img.onerror = () => callback(reader.result as string);
+      img.src = reader.result;
     };
     reader.readAsDataURL(file);
   };
 
-  // Admin Login Handler
+  // Admin Login / First-Time PIN Setup Handler (No hardcoded secrets in source code)
   const handleAdminLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (pinInput.trim() === adminPin) {
+    const entered = pinInput.trim();
+    if (!adminPin) {
+      if (entered.length < 4) {
+        setPinError(true);
+        return;
+      }
+      setAdminPin(entered);
       setIsAuthenticated(true);
+      try {
+        sessionStorage.setItem(STORAGE_KEYS.adminSession, '1');
+      } catch {
+        // Ignore session storage errors
+      }
+      setPinError(false);
+      setPinInput('');
+      setView('admin');
+      return;
+    }
+    if (entered === adminPin) {
+      setIsAuthenticated(true);
+      try {
+        sessionStorage.setItem(STORAGE_KEYS.adminSession, '1');
+      } catch {
+        // Ignore session storage errors
+      }
       setPinError(false);
       setPinInput('');
       setView('admin');
@@ -1026,7 +1648,19 @@ export function App() {
 
   // Export Leads to CSV
   const exportLeadsCsv = () => {
-    const headers = ['ID', 'Full Name', 'Phone', 'Country', 'Email', 'Service', 'Message', 'Status', 'Admin Notes', 'Created At'];
+    const headers = [
+      'ID',
+      'Full Name',
+      'Phone',
+      'Country',
+      'Email',
+      'Service',
+      'Timeline',
+      'Message',
+      'Status',
+      'Admin Notes',
+      'Created At',
+    ];
     const rows = leads.map((l) => [
       l.id,
       `"${l.fullName.replace(/"/g, '""')}"`,
@@ -1034,12 +1668,15 @@ export function App() {
       `"${l.country.replace(/"/g, '""')}"`,
       `"${l.email}"`,
       `"${getServiceLabel(l.serviceValue)}"`,
+      `"${(l.timeline || '').replace(/"/g, '""')}"`,
       `"${l.message.replace(/"/g, '""')}"`,
       l.status,
       `"${l.adminNotes.replace(/"/g, '""')}"`,
       l.createdAt,
     ]);
-    const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    const csvContent =
+      'data:text/csv;charset=utf-8,\uFEFF' +
+      [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
@@ -1123,35 +1760,89 @@ export function App() {
       id="top"
       dir={isRTL ? 'rtl' : 'ltr'}
       lang={lang}
-      className="min-h-screen bg-[#FAF7F2] text-[#4A3F3B] selection:bg-[#C47D6B] selection:text-white antialiased"
+      className="min-h-screen bg-[#FAF7F2] text-[#4A3F3B] selection:bg-[#9A4F3E] selection:text-white antialiased"
       style={{
         fontFamily: isRTL
           ? "'Cairo', system-ui, sans-serif"
           : "'Montserrat', system-ui, -apple-system, sans-serif",
       }}
     >
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap');
-        html { scroll-behavior: smooth; }
-        body, input, button, select, textarea, h1, h2, h3, p, span, a, label {
-          font-family: ${isRTL ? "'Cairo', system-ui, sans-serif" : "'Montserrat', system-ui, -apple-system, sans-serif"};
-        }
-      `}</style>
-
       {/* Live Save Toast */}
       {toastMessage && (
-        <div className="fixed top-20 end-5 z-50 flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#1C1918] text-white text-xs sm:text-sm font-semibold shadow-xl border border-[#C47D6B]/40">
+        <div
+          role="status"
+          aria-live="polite"
+          className="fixed top-20 end-5 z-50 flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#1C1918] text-white text-xs sm:text-sm font-semibold shadow-xl border border-[#C47D6B]/40"
+        >
           <CheckCircle2 className="w-4 h-4 text-[#1E9E54]" />
           <span>{toastMessage}</span>
         </div>
       )}
 
+      {/* Floating Admin Preview Bar when logged in as Coordinator and viewing public site */}
+      {view === 'landing' && isAuthenticated && (
+        <div className="bg-[#1C1918] text-white text-xs py-2 px-4 border-b border-[#C47D6B]/40">
+          <div className="max-w-[1320px] mx-auto flex items-center justify-between gap-2">
+            <span className="inline-flex items-center gap-1.5 font-semibold text-[#EACDA3]">
+              <LayoutDashboard className="w-3.5 h-3.5" />
+              <span>{t.nav.returnToAdmin}</span>
+            </span>
+            <button
+              type="button"
+              onClick={openAdminPortal}
+              className="px-3 py-1 rounded-lg bg-[#9A4F3E] hover:bg-[#7D3D2E] text-white font-bold text-xs cursor-pointer transition-colors"
+            >
+              {t.nav.dashboardBtn}
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* =====================================================================
-          STICKY MINIMAL HEADER (PUBLIC SITE & ADMIN MODE)
+          TOP TRUST & CREDIBILITY BAR (PUBLIC LANDING VIEW)
       ====================================================================== */}
-      <header className="sticky top-0 z-40 bg-[#FAF7F2]/95 backdrop-blur-md border-b border-[#E5D6CE]">
-        <div className="max-w-[1180px] mx-auto px-4 sm:px-8 min-h-[76px] flex items-center justify-between gap-3">
-          {/* Original Unmodified ESTELUX Logo */}
+      {view === 'landing' && (
+        <div className="bg-[#3D221C] text-[#FAF5F2] border-b border-[#5A352C] text-[11px] sm:text-xs py-2 px-4">
+          <div className="max-w-[1320px] mx-auto sm:px-4 flex items-center justify-between gap-4 whitespace-nowrap overflow-x-auto">
+            <div className="flex items-center gap-5">
+              <span className="inline-flex items-center gap-1.5 font-medium">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#F0C6BA] shrink-0" />
+                <span>{t.topBar.accredited}</span>
+              </span>
+              <span className="hidden md:inline-flex items-center gap-1.5 font-medium text-[#F2DDD7]">
+                <Award className="w-3.5 h-3.5 text-[#F0C6BA] shrink-0" />
+                <span>{t.topBar.materials}</span>
+              </span>
+              <span className="hidden xl:inline-flex items-center gap-1.5 font-medium text-[#F2DDD7]">
+                <BadgeCheck className="w-3.5 h-3.5 text-[#5CE68B] shrink-0" />
+                <span>{t.topBar.warranty}</span>
+              </span>
+            </div>
+
+            <div className="flex items-center gap-3 ms-auto shrink-0">
+              <a
+                href={defaultWaUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-[#F0C6BA] hover:text-white font-semibold transition-colors"
+              >
+                <span className="w-2 h-2 rounded-full bg-[#2AD16D] animate-pulse-subtle shrink-0" />
+                <span className="hidden sm:inline">{t.topBar.onlineNow}:</span>
+                <span dir="ltr" className="font-bold text-white">
+                  {WHATSAPP_DISPLAY}
+                </span>
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* =====================================================================
+          STICKY LUXURY HEADER (PUBLIC SITE & ADMIN MODE)
+      ====================================================================== */}
+      <header className="sticky top-0 z-40 bg-[#FCF9F7]/95 backdrop-blur-md border-b border-[#E8C9C1] shadow-2xs">
+        <div className="max-w-[1320px] mx-auto px-4 sm:px-8 h-[74px] flex items-center justify-between gap-4">
+          {/* ESTELUX Horizontal Brand Lockup */}
           <a
             href="#top"
             onClick={(e) => {
@@ -1161,39 +1852,86 @@ export function App() {
               }
             }}
             aria-label={t.nav.homeAria}
-            className="inline-flex items-center gap-3 group focus:outline-none"
+            className="inline-flex items-center gap-2.5 sm:gap-3 group focus:outline-none shrink-0"
           >
-            <div className="bg-[#0B0A0A] rounded-lg px-2 py-1 shadow-xs border border-[#2A2422] flex items-center justify-center">
+            <div className="bg-white rounded-xl px-2 py-1 shadow-2xs border border-[#E8C9C1] flex items-center justify-center shrink-0">
               <img
-                src={brandLogo}
+                src={brandLogo === DEFAULT_ASSETS.logo ? '/estelux-emblem.png' : brandLogo}
                 alt={t.nav.logoAlt}
-                className="h-10 sm:h-11 w-auto object-contain block"
+                width={52}
+                height={41}
+                decoding="async"
+                onError={(e) => {
+                  const target = e.currentTarget;
+                  if (!target.src.endsWith('/estelux-logo.png')) {
+                    target.src = DEFAULT_ASSETS.logo;
+                  }
+                }}
+                className="h-9 sm:h-10 w-auto object-contain block"
               />
             </div>
-            <div className="hidden md:flex flex-col">
-              <span className="text-sm font-bold tracking-[0.18em] text-[#1C1918] leading-tight">
+            <div className="flex flex-col">
+              <span className="text-sm sm:text-base font-extrabold tracking-[0.26em] text-[#9E5B4B] leading-none">
                 ESTELUX
               </span>
-              <span className="text-[11px] font-medium text-[#786A65] mt-0.5">
+              <span className="text-[10px] sm:text-[11px] font-semibold tracking-[0.06em] text-[#6B504A] mt-1 whitespace-nowrap">
                 {t.brandSubtitle}
               </span>
             </div>
           </a>
 
-          {/* Minimal Navigation Controls (No Public Dashboard Button) */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            {view === 'landing' ? (
+          {/* Desktop Quick Section Navigation (Single-Line No-Wrap) */}
+          {view === 'landing' && (
+            <nav
+              aria-label="Primary Navigation"
+              className="hidden xl:flex items-center gap-6 text-[13px] font-bold text-[#3B2A26] whitespace-nowrap"
+            >
               <a
-                href="#services"
-                className="hidden lg:inline-block text-xs sm:text-sm font-semibold text-[#1C1918] hover:text-[#C47D6B] underline underline-offset-4 transition-colors px-2"
+                href="#treatments"
+                className="hover:text-[#9A4F3E] transition-colors py-1"
               >
-                {t.nav.allServices}
+                {t.nav.treatments}
               </a>
-            ) : (
+              <a
+                href="#gallery"
+                className="hover:text-[#9A4F3E] transition-colors py-1"
+              >
+                {t.nav.gallery}
+              </a>
+              <a
+                href="#why-estelux"
+                className="hover:text-[#9A4F3E] transition-colors py-1"
+              >
+                {t.nav.whyUs}
+              </a>
+              <a
+                href="#journey"
+                className="hover:text-[#9A4F3E] transition-colors py-1"
+              >
+                {t.nav.journey}
+              </a>
+              <a
+                href="#reviews"
+                className="hover:text-[#9A4F3E] transition-colors py-1"
+              >
+                {t.nav.reviews}
+              </a>
+              <a
+                href="#faq"
+                className="hover:text-[#9A4F3E] transition-colors py-1"
+              >
+                {t.nav.faq}
+              </a>
+            </nav>
+          )}
+
+          {/* Right Controls (Single-Line No-Wrap) */}
+          <div className="flex items-center gap-2 shrink-0 whitespace-nowrap">
+            {view !== 'landing' && (
               <button
                 type="button"
                 onClick={exitToLandingPage}
-                className="inline-flex items-center gap-1.5 min-h-[38px] px-3 py-1.5 rounded-lg bg-[#EFE7DD] hover:bg-[#E5D6CE] text-[#1C1918] text-xs font-semibold transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 h-10 px-3.5 rounded-xl bg-[#EFE7DD] hover:bg-[#E5D6CE] text-[#1C1918] text-xs font-bold transition-colors cursor-pointer whitespace-nowrap"
               >
                 <span>{t.nav.backToSite}</span>
               </button>
@@ -1203,27 +1941,113 @@ export function App() {
             <button
               type="button"
               onClick={() => setLang(lang === 'en' ? 'ar' : 'en')}
-              className="inline-flex items-center gap-1.5 min-h-[38px] px-3 py-1.5 rounded-lg border border-[#CDBBB2] bg-white hover:border-[#C47D6B] text-xs font-semibold text-[#1C1918] transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 h-10 px-3.5 rounded-xl border border-[#DDB0A5] bg-white hover:border-[#9A4F3E] text-xs font-bold text-[#1C1918] transition-colors cursor-pointer whitespace-nowrap"
             >
-              <Globe className="w-3.5 h-3.5 text-[#C47D6B]" />
+              <Globe className="w-3.5 h-3.5 text-[#9A4F3E] shrink-0" />
               <span>{t.nav.langSwitch}</span>
             </button>
 
-            {/* Direct WhatsApp Header Button */}
             {view === 'landing' && (
+              <>
+                <a
+                  href="#consultation"
+                  className="hidden sm:inline-flex items-center justify-center h-10 px-4 rounded-xl bg-[#9A4F3E] hover:bg-[#7D3D2E] text-white text-xs font-bold shadow-2xs transition-colors whitespace-nowrap"
+                >
+                  <span>{t.nav.freeQuote}</span>
+                </a>
+
+                <a
+                  href={defaultWaUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={t.nav.whatsappAria}
+                  className="inline-flex items-center justify-center gap-1.5 h-10 px-3.5 sm:px-4 rounded-xl bg-[#157A3E] hover:bg-[#106231] text-white text-xs font-bold shadow-2xs transition-colors whitespace-nowrap"
+                >
+                  <MessageCircle className="w-3.5 h-3.5 shrink-0" />
+                  <span className="hidden md:inline">{t.nav.whatsapp}</span>
+                </a>
+
+                <button
+                  type="button"
+                  onClick={() => setMobileMenuOpen((prev) => !prev)}
+                  aria-label="Toggle Menu"
+                  aria-expanded={mobileMenuOpen}
+                  className="xl:hidden inline-flex items-center justify-center w-10 h-10 rounded-xl border border-[#DDB0A5] bg-white text-[#1C1918] cursor-pointer shrink-0"
+                >
+                  {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Mobile Drawer Navigation */}
+        {view === 'landing' && mobileMenuOpen && (
+          <div className="lg:hidden bg-white border-t border-[#E5D6CE] px-4 py-4 space-y-2 shadow-lg">
+            <div className="grid grid-cols-2 gap-2 text-xs font-bold text-[#1C1918]">
+              <a
+                href="#treatments"
+                onClick={() => setMobileMenuOpen(false)}
+                className="p-2.5 rounded-xl bg-[#FAF7F2] hover:bg-[#EFE7DD]"
+              >
+                {t.nav.treatments}
+              </a>
+              <a
+                href="#gallery"
+                onClick={() => setMobileMenuOpen(false)}
+                className="p-2.5 rounded-xl bg-[#FAF7F2] hover:bg-[#EFE7DD]"
+              >
+                {t.nav.gallery}
+              </a>
+              <a
+                href="#why-estelux"
+                onClick={() => setMobileMenuOpen(false)}
+                className="p-2.5 rounded-xl bg-[#FAF7F2] hover:bg-[#EFE7DD]"
+              >
+                {t.nav.whyUs}
+              </a>
+              <a
+                href="#journey"
+                onClick={() => setMobileMenuOpen(false)}
+                className="p-2.5 rounded-xl bg-[#FAF7F2] hover:bg-[#EFE7DD]"
+              >
+                {t.nav.journey}
+              </a>
+              <a
+                href="#reviews"
+                onClick={() => setMobileMenuOpen(false)}
+                className="p-2.5 rounded-xl bg-[#FAF7F2] hover:bg-[#EFE7DD]"
+              >
+                {t.nav.reviews}
+              </a>
+              <a
+                href="#faq"
+                onClick={() => setMobileMenuOpen(false)}
+                className="p-2.5 rounded-xl bg-[#FAF7F2] hover:bg-[#EFE7DD]"
+              >
+                {t.nav.faq}
+              </a>
+            </div>
+            <div className="pt-2 flex gap-2">
+              <a
+                href="#consultation"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex-1 py-2.5 rounded-xl bg-[#9A4F3E] text-white text-center text-xs font-bold"
+              >
+                {t.hero.primaryCta}
+              </a>
               <a
                 href={defaultWaUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label={t.nav.whatsappAria}
-                className="inline-flex items-center gap-1.5 min-h-[38px] px-3.5 py-1.5 rounded-lg bg-[#1E9E54] hover:bg-[#198747] text-white text-xs font-semibold shadow-2xs transition-colors"
+                className="flex-1 py-2.5 rounded-xl bg-[#157A3E] text-white text-center text-xs font-bold inline-flex items-center justify-center gap-1.5"
               >
                 <MessageCircle className="w-3.5 h-3.5" />
-                <span className="hidden xs:inline sm:inline">{t.nav.whatsapp}</span>
+                <span>{t.nav.whatsapp}</span>
               </a>
-            )}
+            </div>
           </div>
-        </div>
+        )}
       </header>
 
       {/* =====================================================================
@@ -1251,9 +2075,8 @@ export function App() {
                   }}
                   placeholder={t.admin.pinPlaceholder}
                   autoFocus
-                  className={`w-full min-h-[48px] px-4 rounded-xl border text-center tracking-[0.25em] font-bold text-lg text-[#1C1918] focus:outline-none focus:ring-2 focus:ring-[#C47D6B] ${
-                    pinError ? 'border-red-600' : 'border-[#CDBBB2]'
-                  }`}
+                  className={`w-full min-h-[48px] px-4 rounded-xl border text-center tracking-[0.25em] font-bold text-lg text-[#1C1918] focus:outline-none focus:ring-2 focus:ring-[#C47D6B] ${pinError ? 'border-red-600' : 'border-[#CDBBB2]'
+                    }`}
                 />
                 {pinError && (
                   <p className="mt-2 text-xs text-red-700 text-center font-semibold">
@@ -1264,7 +2087,7 @@ export function App() {
 
               <button
                 type="submit"
-                className="w-full min-h-[48px] rounded-xl bg-[#C47D6B] hover:bg-[#A86554] text-white font-bold text-sm transition-colors cursor-pointer"
+                className="w-full min-h-[48px] rounded-xl bg-[#9A4F3E] hover:bg-[#7D3D2E] text-white font-bold text-sm transition-colors cursor-pointer"
               >
                 {t.admin.loginBtn}
               </button>
@@ -1274,7 +2097,7 @@ export function App() {
               <button
                 type="button"
                 onClick={exitToLandingPage}
-                className="text-xs font-semibold text-[#786A65] hover:text-[#1C1918] cursor-pointer"
+                className="text-xs font-semibold text-[#52443F] hover:text-[#1C1918] cursor-pointer"
               >
                 {t.admin.cancelBtn}
               </button>
@@ -1287,7 +2110,7 @@ export function App() {
           VIEW 2: ADMIN DASHBOARD (LEADS INBOX + MEDIA/GALLERY MANAGER)
       ====================================================================== */}
       {view === 'admin' && isAuthenticated && (
-        <main className="max-w-[1180px] mx-auto px-4 sm:px-8 py-8 sm:py-10 space-y-6">
+        <main className="max-w-[1320px] mx-auto px-4 sm:px-8 py-8 sm:py-10 space-y-6">
           {/* Top Dashboard Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 sm:p-6 rounded-2xl border border-[#E5D6CE]">
             <div>
@@ -1328,6 +2151,11 @@ export function App() {
                 type="button"
                 onClick={() => {
                   setIsAuthenticated(false);
+                  try {
+                    sessionStorage.removeItem(STORAGE_KEYS.adminSession);
+                  } catch {
+                    // Ignore
+                  }
                   exitToLandingPage();
                 }}
                 className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#1C1918] text-white text-xs font-semibold cursor-pointer"
@@ -1341,7 +2169,7 @@ export function App() {
           {/* KPI Summary Cards */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             <div className="bg-white p-4 sm:p-5 rounded-2xl border border-[#E5D6CE]">
-              <div className="flex items-center justify-between text-xs font-semibold text-[#786A65]">
+              <div className="flex items-center justify-between text-xs font-semibold text-[#52443F]">
                 <span>{t.admin.stats.total}</span>
                 <Users className="w-4 h-4 text-[#C47D6B]" />
               </div>
@@ -1351,17 +2179,17 @@ export function App() {
             </div>
 
             <div className="bg-white p-4 sm:p-5 rounded-2xl border border-[#E5D6CE]">
-              <div className="flex items-center justify-between text-xs font-semibold text-[#786A65]">
+              <div className="flex items-center justify-between text-xs font-semibold text-[#52443F]">
                 <span>{t.admin.stats.new}</span>
-                <Clock className="w-4 h-4 text-[#B46956]" />
+                <Clock className="w-4 h-4 text-[#8C4332]" />
               </div>
-              <p className="mt-2 text-2xl sm:text-3xl font-extrabold text-[#B46956]">
+              <p className="mt-2 text-2xl sm:text-3xl font-extrabold text-[#8C4332]">
                 {isRTL ? toArabicDigits(newLeadsCount) : newLeadsCount}
               </p>
             </div>
 
             <div className="bg-white p-4 sm:p-5 rounded-2xl border border-[#E5D6CE]">
-              <div className="flex items-center justify-between text-xs font-semibold text-[#786A65]">
+              <div className="flex items-center justify-between text-xs font-semibold text-[#52443F]">
                 <span>{t.admin.stats.booked}</span>
                 <CheckSquare className="w-4 h-4 text-[#1E9E54]" />
               </div>
@@ -1373,7 +2201,7 @@ export function App() {
             </div>
 
             <div className="bg-white p-4 sm:p-5 rounded-2xl border border-[#E5D6CE]">
-              <div className="flex items-center justify-between text-xs font-semibold text-[#786A65]">
+              <div className="flex items-center justify-between text-xs font-semibold text-[#52443F]">
                 <span>{t.admin.stats.activePhotos}</span>
                 <ImageIcon className="w-4 h-4 text-[#C47D6B]" />
               </div>
@@ -1388,20 +2216,18 @@ export function App() {
             <button
               type="button"
               onClick={() => setAdminTab('leads')}
-              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-colors cursor-pointer ${
-                adminTab === 'leads'
-                  ? 'bg-[#C47D6B] text-white shadow-xs'
-                  : 'bg-white text-[#4A3F3B] border border-[#E5D6CE] hover:border-[#C47D6B]'
-              }`}
+              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-colors cursor-pointer ${adminTab === 'leads'
+                ? 'bg-[#9A4F3E] text-white shadow-xs'
+                : 'bg-white text-[#4A3F3B] border border-[#E5D6CE] hover:border-[#C47D6B]'
+                }`}
             >
               <Inbox className="w-4 h-4" />
               <span>{t.admin.tabLeads}</span>
               <span
-                className={`px-2 py-0.5 rounded-full text-[11px] font-extrabold ${
-                  adminTab === 'leads'
-                    ? 'bg-white text-[#C47D6B]'
-                    : 'bg-[#EFE7DD] text-[#1C1918]'
-                }`}
+                className={`px-2 py-0.5 rounded-full text-[11px] font-extrabold ${adminTab === 'leads'
+                  ? 'bg-white text-[#C47D6B]'
+                  : 'bg-[#EFE7DD] text-[#1C1918]'
+                  }`}
               >
                 {isRTL ? toArabicDigits(leads.length) : leads.length}
               </span>
@@ -1410,11 +2236,10 @@ export function App() {
             <button
               type="button"
               onClick={() => setAdminTab('media')}
-              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-colors cursor-pointer ${
-                adminTab === 'media'
-                  ? 'bg-[#C47D6B] text-white shadow-xs'
-                  : 'bg-white text-[#4A3F3B] border border-[#E5D6CE] hover:border-[#C47D6B]'
-              }`}
+              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-colors cursor-pointer ${adminTab === 'media'
+                ? 'bg-[#9A4F3E] text-white shadow-xs'
+                : 'bg-white text-[#4A3F3B] border border-[#E5D6CE] hover:border-[#C47D6B]'
+                }`}
             >
               <ImageIcon className="w-4 h-4" />
               <span>{t.admin.tabMedia}</span>
@@ -1429,7 +2254,7 @@ export function App() {
               {/* Filter & Search Toolbar */}
               <div className="bg-white p-4 rounded-2xl border border-[#E5D6CE] flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
                 <div className="relative flex-1">
-                  <Search className="w-4 h-4 text-[#786A65] absolute start-3.5 top-1/2 -translate-y-1/2" />
+                  <Search className="w-4 h-4 text-[#52443F] absolute start-3.5 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
                     value={leadSearch}
@@ -1453,11 +2278,10 @@ export function App() {
                       key={st.key}
                       type="button"
                       onClick={() => setLeadStatusFilter(st.key)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer ${
-                        leadStatusFilter === st.key
-                          ? 'bg-[#1C1918] text-white'
-                          : 'bg-[#FAF7F2] text-[#4A3F3B] border border-[#E5D6CE] hover:border-[#C47D6B]'
-                      }`}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer ${leadStatusFilter === st.key
+                        ? 'bg-[#1C1918] text-white'
+                        : 'bg-[#FAF7F2] text-[#4A3F3B] border border-[#E5D6CE] hover:border-[#C47D6B]'
+                        }`}
                     >
                       {st.label}
                     </button>
@@ -1476,7 +2300,7 @@ export function App() {
 
               {/* Leads Cards List */}
               {filteredLeads.length === 0 ? (
-                <div className="bg-white rounded-2xl border border-[#E5D6CE] p-12 text-center text-sm text-[#786A65]">
+                <div className="bg-white rounded-2xl border border-[#E5D6CE] p-12 text-center text-sm text-[#52443F]">
                   {t.admin.leads.empty}
                 </div>
               ) : (
@@ -1490,12 +2314,12 @@ export function App() {
 
                     const statusBadgeStyle =
                       lead.status === 'new'
-                        ? 'bg-[#C47D6B]/15 text-[#A86554] border-[#C47D6B]/30'
+                        ? 'bg-[#9A4F3E]/15 text-[#A86554] border-[#C47D6B]/30'
                         : lead.status === 'contacted'
-                        ? 'bg-amber-50 text-amber-800 border-amber-200'
-                        : lead.status === 'booked'
-                        ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                        : 'bg-stone-100 text-stone-600 border-stone-200';
+                          ? 'bg-amber-50 text-amber-800 border-amber-200'
+                          : lead.status === 'booked'
+                            ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                            : 'bg-stone-100 text-stone-600 border-stone-200';
 
                     return (
                       <article
@@ -1514,12 +2338,17 @@ export function App() {
                                 {lead.status === 'new'
                                   ? t.admin.leads.statusNew
                                   : lead.status === 'contacted'
-                                  ? t.admin.leads.statusContacted
-                                  : lead.status === 'booked'
-                                  ? t.admin.leads.statusBooked
-                                  : t.admin.leads.statusArchived}
+                                    ? t.admin.leads.statusContacted
+                                    : lead.status === 'booked'
+                                      ? t.admin.leads.statusBooked
+                                      : t.admin.leads.statusArchived}
                               </span>
-                              <span className="text-[11px] text-[#786A65]">
+                              {lead.timeline && (
+                                <span className="px-2 py-0.5 rounded-md bg-[#FAF7F2] border border-[#E5D6CE] text-[11px] font-semibold text-[#5A4E4A]">
+                                  {lead.timeline}
+                                </span>
+                              )}
+                              <span className="text-[11px] text-[#52443F]">
                                 • {formatDate(lead.createdAt)}
                               </span>
                             </div>
@@ -1557,7 +2386,7 @@ export function App() {
                               href={waReplyHref}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1.5 min-h-[38px] px-3.5 rounded-xl bg-[#1E9E54] hover:bg-[#198747] text-white text-xs font-bold transition-colors"
+                              className="inline-flex items-center gap-1.5 min-h-[38px] px-3.5 rounded-xl bg-[#157A3E] hover:bg-[#198747] text-white text-xs font-bold transition-colors"
                             >
                               <MessageCircle className="w-3.5 h-3.5" />
                               <span>{t.admin.leads.whatsappReply}</span>
@@ -1574,11 +2403,10 @@ export function App() {
                                   setTimeout(() => setConfirmDeleteLeadId(null), 3000);
                                 }
                               }}
-                              className={`inline-flex items-center gap-1 min-h-[38px] px-3 rounded-xl border text-xs font-semibold cursor-pointer ${
-                                confirmDeleteLeadId === lead.id
-                                  ? 'bg-red-600 text-white border-red-600'
-                                  : 'bg-white text-red-700 border-red-200 hover:bg-red-50'
-                              }`}
+                              className={`inline-flex items-center gap-1 min-h-[38px] px-3 rounded-xl border text-xs font-semibold cursor-pointer ${confirmDeleteLeadId === lead.id
+                                ? 'bg-red-600 text-white border-red-600'
+                                : 'bg-white text-red-700 border-red-200 hover:bg-red-50'
+                                }`}
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                               <span>
@@ -1593,13 +2421,13 @@ export function App() {
                         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
                           <div className="lg:col-span-6 bg-[#FAF7F2] p-3.5 rounded-xl border border-[#EFE7DD] space-y-1.5">
                             <div className="flex items-center justify-between text-xs">
-                              <span className="font-bold text-[#B46956]">{serviceName}</span>
-                              <span className="text-[11px] uppercase text-[#786A65]">
+                              <span className="font-bold text-[#8C4332]">{serviceName}</span>
+                              <span className="text-[11px] uppercase text-[#52443F]">
                                 {lead.langSubmitted}
                               </span>
                             </div>
                             <p className="text-xs sm:text-sm text-[#1C1918] leading-relaxed flex items-start gap-2">
-                              <FileText className="w-4 h-4 text-[#786A65] shrink-0 mt-0.5" />
+                              <FileText className="w-4 h-4 text-[#52443F] shrink-0 mt-0.5" />
                               <span>{lead.message || t.admin.leads.noMessage}</span>
                             </p>
                           </div>
@@ -1668,15 +2496,18 @@ export function App() {
                   {/* Brand Logo Card */}
                   <div className="p-4 rounded-2xl bg-[#FAF7F2] border border-[#E5D6CE] space-y-3">
                     <p className="text-sm font-bold text-[#1C1918]">{t.admin.media.logoLabel}</p>
-                    <div className="h-28 rounded-xl bg-[#0B0A0A] flex items-center justify-center p-3 border border-[#2A2422]">
+                    <div className="h-28 rounded-xl bg-white flex items-center justify-center p-3 border border-[#E8C9C1]">
                       <img
                         src={brandLogo}
                         alt="ESTELUX Logo Preview"
-                        className="max-h-20 w-auto object-contain"
+                        onError={(e) => {
+                          e.currentTarget.src = DEFAULT_ASSETS.logo;
+                        }}
+                        className="max-h-24 w-auto object-contain"
                       />
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
-                      <label className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#C47D6B] hover:bg-[#A86554] text-white text-xs font-bold cursor-pointer">
+                      <label className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#9A4F3E] hover:bg-[#7D3D2E] text-white text-xs font-bold cursor-pointer">
                         <Upload className="w-3.5 h-3.5" />
                         <span>{t.admin.media.uploadBtn}</span>
                         <input
@@ -1684,10 +2515,14 @@ export function App() {
                           accept="image/*"
                           className="hidden"
                           onChange={(e) =>
-                            handleImageFileUpload(e.target.files?.[0], (url) => {
-                              setBrandLogo(url);
-                              showToast(t.admin.media.savedToast);
-                            })
+                            handleImageFileUpload(
+                              e.target.files?.[0],
+                              (url) => {
+                                setBrandLogo(url);
+                                showToast(t.admin.media.savedToast);
+                              },
+                              true
+                            )
                           }
                         />
                       </label>
@@ -1726,11 +2561,14 @@ export function App() {
                       <img
                         src={heroPhoto}
                         alt="Hero Clinic Preview"
+                        onError={(e) => {
+                          e.currentTarget.src = DEFAULT_ASSETS.heroDental;
+                        }}
                         className="w-full h-full object-cover"
                       />
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
-                      <label className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#C47D6B] hover:bg-[#A86554] text-white text-xs font-bold cursor-pointer">
+                      <label className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#9A4F3E] hover:bg-[#7D3D2E] text-white text-xs font-bold cursor-pointer">
                         <Upload className="w-3.5 h-3.5" />
                         <span>{t.admin.media.uploadBtn}</span>
                         <input
@@ -1786,12 +2624,12 @@ export function App() {
 
                 <form onSubmit={handleAddNewCase} className="grid grid-cols-1 md:grid-cols-12 gap-4">
                   <div className="md:col-span-4 space-y-2">
-                    <div className="aspect-[3/4] max-h-56 w-full rounded-xl border-2 border-dashed border-[#CDBBB2] bg-[#FAF7F2] flex flex-col items-center justify-center overflow-hidden p-2">
+                    <div className="aspect-[4/3] max-h-56 w-full rounded-xl border-2 border-dashed border-[#CDBBB2] bg-[#FAF7F2] flex flex-col items-center justify-center overflow-hidden p-2">
                       {newCaseSrc ? (
                         <img
                           src={newCaseSrc}
                           alt="New case preview"
-                          className="w-full h-full object-contain"
+                          className="w-full h-full object-cover rounded-lg"
                         />
                       ) : (
                         <div className="text-center space-y-1.5 p-3">
@@ -1901,7 +2739,7 @@ export function App() {
                       <button
                         type="submit"
                         disabled={!newCaseSrc.trim()}
-                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#C47D6B] hover:bg-[#A86554] disabled:opacity-50 text-white text-xs sm:text-sm font-bold cursor-pointer"
+                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#9A4F3E] hover:bg-[#7D3D2E] disabled:opacity-50 text-white text-xs sm:text-sm font-bold cursor-pointer"
                       >
                         <Plus className="w-4 h-4" />
                         <span>{t.admin.media.addCaseBtn}</span>
@@ -1929,18 +2767,20 @@ export function App() {
                     return (
                       <div
                         key={item.id}
-                        className={`rounded-2xl border p-4 flex flex-col sm:flex-row gap-4 ${
-                          item.visible
-                            ? 'bg-[#FAF7F2] border-[#E5D6CE]'
-                            : 'bg-stone-100/80 border-stone-300 opacity-80'
-                        }`}
+                        className={`rounded-2xl border p-4 flex flex-col sm:flex-row gap-4 ${item.visible
+                          ? 'bg-[#FAF7F2] border-[#E5D6CE]'
+                          : 'bg-stone-100/80 border-stone-300 opacity-80'
+                          }`}
                       >
-                        <div className="w-full sm:w-32 shrink-0 space-y-2">
-                          <div className="aspect-[3/4] rounded-xl bg-white border border-[#E5D6CE] overflow-hidden">
+                        <div className="w-full sm:w-36 shrink-0 space-y-2">
+                          <div className="aspect-[4/3] rounded-xl bg-white border border-[#E5D6CE] overflow-hidden">
                             <img
                               src={isEditing ? editDraft.src : item.src}
                               alt={item.titleEn}
-                              className="w-full h-full object-contain p-1"
+                              onError={(e) => {
+                                e.currentTarget.src = DEFAULT_ASSETS.case1;
+                              }}
+                              className="w-full h-full object-cover"
                             />
                           </div>
 
@@ -1988,6 +2828,24 @@ export function App() {
                                 placeholder={t.admin.media.caseTitleAr}
                                 className="w-full px-2.5 py-1.5 rounded-lg border border-[#CDBBB2] bg-white text-xs font-semibold"
                               />
+                              <input
+                                type="text"
+                                value={editDraft.captionEn}
+                                onChange={(e) =>
+                                  setEditDraft({ ...editDraft, captionEn: e.target.value })
+                                }
+                                placeholder={t.admin.media.caseCaptionEn}
+                                className="w-full px-2.5 py-1.5 rounded-lg border border-[#CDBBB2] bg-white text-xs"
+                              />
+                              <input
+                                type="text"
+                                value={editDraft.captionAr}
+                                onChange={(e) =>
+                                  setEditDraft({ ...editDraft, captionAr: e.target.value })
+                                }
+                                placeholder={t.admin.media.caseCaptionAr}
+                                className="w-full px-2.5 py-1.5 rounded-lg border border-[#CDBBB2] bg-white text-xs"
+                              />
                               <select
                                 value={editDraft.category}
                                 onChange={(e) => {
@@ -2024,22 +2882,24 @@ export function App() {
                             <div className="space-y-1">
                               <div className="flex items-center justify-between gap-2">
                                 <span
-                                  className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                                    item.visible
-                                      ? 'bg-emerald-100 text-emerald-800'
-                                      : 'bg-stone-200 text-stone-700'
-                                  }`}
+                                  className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${item.visible
+                                    ? 'bg-emerald-100 text-emerald-800'
+                                    : 'bg-stone-200 text-stone-700'
+                                    }`}
                                 >
                                   {item.visible
                                     ? t.admin.media.visibleBadge
                                     : t.admin.media.hiddenBadge}
                                 </span>
-                                <span className="text-[11px] font-bold text-[#B46956]">
+                                <span className="text-[11px] font-bold text-[#8C4332]">
                                   {isRTL ? item.tagAr : item.tagEn}
                                 </span>
                               </div>
                               <h3 className="text-sm font-bold text-[#1C1918]">{item.titleEn}</h3>
                               <p className="text-xs font-semibold text-[#5A4E4A]">{item.titleAr}</p>
+                              <p className="text-[11px] text-[#52443F] line-clamp-2 pt-0.5">
+                                {isRTL ? item.captionAr : item.captionEn}
+                              </p>
                             </div>
                           )}
 
@@ -2057,7 +2917,7 @@ export function App() {
                                     setEditDraft(null);
                                     showToast(t.admin.media.savedToast);
                                   }}
-                                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#1E9E54] text-white text-xs font-bold cursor-pointer"
+                                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#157A3E] text-white text-xs font-bold cursor-pointer"
                                 >
                                   <Check className="w-3.5 h-3.5" />
                                   <span>{t.admin.media.saveBtn}</span>
@@ -2158,74 +3018,108 @@ export function App() {
       {view === 'landing' && (
         <main>
           {/* =================================================================
-              SECTION 01 & 02 — HERO + DOMINANT DENTAL SURGERY & COSMETIC DENTISTRY
-              + DIRECT EMBEDDED CONSULTATION FORM
+              SECTION 01 — HERO + CLINICAL GALLERY + STICKY CONSULTATION FORM
           ================================================================== */}
           <section
             aria-labelledby="main-heading"
-            className="bg-gradient-to-br from-[#EFE7DD]/85 via-[#FAF7F2] to-[#FAF7F2] py-8 sm:py-14 border-b border-[#E5D6CE]"
+            className="bg-gradient-to-br from-[#F7EAE6]/80 via-[#FCF9F7] to-[#FCF9F7] py-6 sm:py-10 border-b border-[#E8C9C1]"
           >
-            <div className="max-w-[1180px] mx-auto px-4 sm:px-8 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+            <div className="max-w-[1320px] mx-auto px-4 sm:px-8 grid grid-cols-1 lg:grid-cols-12 gap-7 xl:gap-10 items-start">
               {/* LEFT / START COLUMN: Dominant Dental Focus & Clinical Results */}
-              <div className="lg:col-span-7 space-y-6">
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#B46956] mb-3">
-                    {t.hero.kicker}
-                  </p>
+              <div className="lg:col-span-7 space-y-5">
+                <div className="space-y-2.5">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#3D221C] text-[#F5D6CC] text-[11px] font-bold uppercase tracking-[0.14em] whitespace-nowrap">
+                      <Sparkles className="w-3 h-3 text-[#F0C6BA] shrink-0" />
+                      <span>{t.hero.kicker}</span>
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-[#0F6934] text-[11px] font-bold whitespace-nowrap">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#157A3E] shrink-0" />
+                      <span>{t.hero.responseBadge}</span>
+                    </span>
+                  </div>
+
                   <h1
                     id="main-heading"
-                    className="text-3xl sm:text-5xl lg:text-[3.2rem] font-extrabold text-[#1C1918] leading-[1.12] tracking-tight"
+                    className="text-3xl sm:text-4xl xl:text-[2.85rem] font-extrabold text-[#1C1918] leading-[1.12] tracking-tight"
                   >
                     {t.hero.title}
                   </h1>
-                  <p className="mt-2 text-base sm:text-lg font-semibold text-[#C47D6B]">
+                  <p
+                    className="text-sm sm:text-base font-semibold text-[#8C4332]"
+                    style={{
+                      fontFamily: isRTL
+                        ? "'Cairo', sans-serif"
+                        : "'Playfair Display', Georgia, serif",
+                    }}
+                  >
                     {t.hero.slogan}
                   </p>
-                  <p className="mt-4 text-sm sm:text-base text-[#4A3F3B] leading-relaxed max-w-2xl">
+                  <p className="text-xs sm:text-[15px] text-[#4A3F3B] leading-relaxed max-w-2xl">
                     {t.hero.lead}
                   </p>
                 </div>
 
-                {/* Direct WhatsApp Lead Action */}
+                {/* Dual Primary Action Buttons */}
                 <div className="flex flex-wrap items-center gap-3">
+                  <a
+                    href="#consultation"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleSelectServiceAndScroll(selectedServiceValue);
+                    }}
+                    className="inline-flex items-center justify-center gap-2 min-h-[48px] px-6 py-2.5 rounded-xl bg-[#9A4F3E] hover:bg-[#7D3D2E] text-white font-bold text-sm shadow-sm transition-all whitespace-nowrap"
+                  >
+                    <span>{t.hero.primaryCta}</span>
+                    {isRTL ? (
+                      <ArrowLeft className="w-4 h-4 shrink-0" />
+                    ) : (
+                      <ArrowRight className="w-4 h-4 shrink-0" />
+                    )}
+                  </a>
+
                   <a
                     href={defaultWaUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2.5 min-h-[48px] px-5 py-2.5 rounded-xl bg-[#1E9E54] hover:bg-[#198747] text-white font-semibold text-sm shadow-sm transition-colors"
+                    className="inline-flex items-center justify-center gap-2 min-h-[48px] px-5 py-2.5 rounded-xl bg-[#157A3E] hover:bg-[#106231] text-white font-bold text-sm shadow-sm transition-colors whitespace-nowrap"
                   >
                     <MessageCircle className="w-4 h-4 shrink-0" />
                     <span>{t.hero.whatsappCta}</span>
-                    <span dir="ltr" className="text-xs opacity-90 font-medium">
+                    <span dir="ltr" className="text-xs opacity-90 font-semibold">
                       ({WHATSAPP_DISPLAY})
                     </span>
                   </a>
                 </div>
 
-                {/* Featured Clinical Banner Photo */}
-                <div className="relative rounded-2xl overflow-hidden border border-[#E5D6CE] bg-[#EFE7DD] shadow-sm">
-                  <img
-                    src={heroPhoto}
-                    alt={t.hero.photoAlt}
-                    className="w-full h-56 sm:h-72 object-cover block"
-                  />
-                  <div className="px-4 py-2.5 bg-white/95 border-t border-[#E5D6CE] flex items-center justify-between text-xs text-[#5A4E4A]">
-                    <span className="font-semibold text-[#1C1918]">{t.hero.photoCaption}</span>
-                    <span className="inline-flex items-center gap-1 text-[#B46956] font-semibold">
-                      <Sparkles className="w-3.5 h-3.5" />
-                      <span>ESTELUX Istanbul</span>
-                    </span>
-                  </div>
+                {/* Key Credibility Metrics Strip */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                  {t.hero.metrics.map((m) => (
+                    <div
+                      key={m.label}
+                      className="bg-white rounded-2xl border border-[#E8C9C1] px-3.5 py-2.5 shadow-2xs"
+                    >
+                      <p className="text-base sm:text-lg font-extrabold text-[#1C1918] whitespace-nowrap">
+                        {m.value}
+                      </p>
+                      <p className="text-[11px] font-semibold text-[#52443F] mt-0.5 truncate">
+                        {m.label}
+                      </p>
+                    </div>
+                  ))}
                 </div>
 
-                {/* Clinical Before & After Gallery */}
-                <div className="pt-2">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
-                    <h2 className="text-base sm:text-lg font-bold text-[#1C1918]">
-                      {t.hero.resultsHeading}
-                    </h2>
+                {/* Clinical Smile Transformations Gallery */}
+                <div id="gallery" className="pt-1 scroll-mt-24 space-y-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                      <h2 className="text-base sm:text-lg font-extrabold text-[#1C1918]">
+                        {t.hero.resultsHeading}
+                      </h2>
+                      <p className="text-xs text-[#52443F]">{t.hero.resultsSub}</p>
+                    </div>
 
-                    <div className="flex flex-wrap items-center gap-1.5">
+                    <div className="flex flex-wrap items-center gap-1.5 shrink-0">
                       {(
                         [
                           { key: 'all', label: t.hero.filters.all },
@@ -2240,10 +3134,10 @@ export function App() {
                             setActiveFilter(tab.key);
                             setLightboxIndex(null);
                           }}
-                          className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+                          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors cursor-pointer whitespace-nowrap ${
                             activeFilter === tab.key
-                              ? 'bg-[#C47D6B] text-white'
-                              : 'bg-white text-[#4A3F3B] border border-[#E5D6CE] hover:border-[#C47D6B]'
+                              ? 'bg-[#9A4F3E] text-white shadow-2xs'
+                              : 'bg-white text-[#4A3F3B] border border-[#E8C9C1] hover:border-[#B27262]'
                           }`}
                         >
                           {tab.label}
@@ -2252,27 +3146,48 @@ export function App() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                     {filteredCases.map((item, index) => (
                       <button
                         key={item.id}
                         type="button"
                         onClick={() => setLightboxIndex(index)}
-                        className="group relative rounded-xl overflow-hidden bg-white border border-[#E5D6CE] hover:border-[#C47D6B] shadow-2xs transition-all text-start focus:outline-none focus:ring-2 focus:ring-[#C47D6B] cursor-pointer"
+                        className="luxury-card-hover group relative rounded-2xl overflow-hidden bg-white border border-[#E8C9C1] hover:border-[#B27262] shadow-2xs text-start focus:outline-none focus:ring-2 focus:ring-[#B27262] cursor-pointer flex flex-col"
                       >
-                        <div className="aspect-[3/4] w-full bg-white overflow-hidden">
+                        <div className="relative aspect-square w-full bg-white p-2 overflow-hidden border-b border-[#F2E2DC]">
                           <img
                             src={item.src}
                             alt={isRTL ? item.titleAr : item.titleEn}
-                            loading="lazy"
-                            className="w-full h-full object-contain p-1 group-hover:scale-[1.03] transition-transform duration-300"
+                            width={600}
+                            height={600}
+                            loading={index < 2 ? 'eager' : 'lazy'}
+                            decoding="async"
+                            onError={(e) => {
+                              e.currentTarget.src = DEFAULT_ASSETS.case1;
+                            }}
+                            className="w-full h-full object-contain group-hover:scale-[1.02] transition-transform duration-300"
                           />
-                        </div>
-                        <div className="p-2 bg-[#FAF7F2] border-t border-[#E5D6CE] flex items-center justify-between gap-1">
-                          <span className="text-[11px] font-semibold text-[#1C1918] truncate">
-                            {isRTL ? item.titleAr : item.titleEn}
+                          <span className="absolute bottom-2.5 end-2.5 inline-flex items-center gap-1 text-[10px] font-bold bg-[#3D221C]/90 text-white px-2.5 py-1 rounded-full shadow-xs">
+                            <ZoomIn className="w-3 h-3 text-[#F0C6BA]" />
+                            <span>{t.hero.resultsHint}</span>
                           </span>
-                          <ZoomIn className="w-3.5 h-3.5 text-[#C47D6B] shrink-0" />
+                        </div>
+                        <div className="p-3 bg-[#FCF9F7] flex-1 flex flex-col justify-between gap-1">
+                          <div className="flex items-center justify-between gap-1.5">
+                            <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#8C4332]">
+                              {isRTL ? item.tagAr : item.tagEn}
+                            </span>
+                            <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#0F6934]">
+                              <BadgeCheck className="w-3 h-3" />
+                              <span>{t.hero.verifiedBadge}</span>
+                            </span>
+                          </div>
+                          <h3 className="text-xs sm:text-sm font-extrabold text-[#1C1918]">
+                            {isRTL ? item.titleAr : item.titleEn}
+                          </h3>
+                          <p className="text-[11px] text-[#52443F] line-clamp-2 leading-relaxed">
+                            {isRTL ? item.captionAr : item.captionEn}
+                          </p>
                         </div>
                       </button>
                     ))}
@@ -2280,42 +3195,43 @@ export function App() {
                 </div>
               </div>
 
-              {/* RIGHT / END COLUMN: Sticky Direct Consultation Form Card */}
+              {/* RIGHT / END COLUMN: Compact Above-the-Fold Sticky Consultation Form */}
               <section
                 id="consultation"
                 aria-labelledby="form-heading"
-                className="lg:col-span-5 lg:sticky lg:top-[96px] bg-white p-6 sm:p-8 rounded-3xl border border-[#E5D6CE] shadow-[0_14px_38px_rgba(28,25,24,0.06)] scroll-mt-24"
+                className="lg:col-span-5 lg:sticky lg:top-[86px] bg-white p-5 sm:p-6 rounded-3xl border-2 border-[#E8C9C1] shadow-[0_18px_48px_rgba(61,34,28,0.08)] scroll-mt-24"
               >
-                <div className="flex items-center justify-between gap-2 mb-3">
-                  <span className="inline-block text-xs font-bold text-[#B46956] bg-[#EFE7DD] px-3 py-1 rounded-md">
-                    {selectedServiceObj.label}
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <span className="inline-flex items-center gap-1 text-[11px] font-extrabold text-[#0F6934] bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full whitespace-nowrap">
+                    <CheckCircle2 className="w-3 h-3 shrink-0" />
+                    <span>{t.form.badge}</span>
                   </span>
                 </div>
 
                 <h2
                   id="form-heading"
-                  className="text-2xl sm:text-3xl font-extrabold text-[#1C1918] tracking-tight"
+                  className="text-xl sm:text-2xl font-extrabold text-[#1C1918] tracking-tight"
                 >
                   {t.form.heading}
                 </h2>
-                <p className="mt-2 mb-5 text-sm text-[#5A4E4A] leading-relaxed">
+                <p className="mt-1 mb-3 text-xs text-[#52443F] leading-relaxed">
                   {t.form.intro}
                 </p>
 
                 {submitted && lastSubmittedLead ? (
-                  <div className="p-5 rounded-2xl bg-[#EFE7DD]/75 border border-[#E5D6CE] space-y-3">
-                    <div className="flex items-center gap-2 text-[#1E9E54] font-bold text-base">
+                  <div className="p-5 rounded-2xl bg-[#FCF9F7] border border-[#E8C9C1] space-y-3.5">
+                    <div className="flex items-center gap-2 text-[#0F6934] font-extrabold text-base">
                       <CheckCircle2 className="w-5 h-5 shrink-0" />
                       <span>{t.form.confirmTitle}</span>
                     </div>
-                    <p className="text-sm text-[#4A3F3B] leading-relaxed">
+                    <p className="text-xs sm:text-sm text-[#4A3F3B] leading-relaxed">
                       {t.form.confirmBody}
                     </p>
                     <a
                       href={buildWhatsAppLinkFromLead(lastSubmittedLead)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-full min-h-[48px] inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#1E9E54] hover:bg-[#198747] text-white font-semibold text-sm transition-colors"
+                      className="w-full min-h-[46px] inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#157A3E] hover:bg-[#106231] text-white font-bold text-sm transition-colors shadow-sm"
                     >
                       <MessageCircle className="w-4 h-4" />
                       <span>{t.form.confirmWaBtn}</span>
@@ -2327,48 +3243,110 @@ export function App() {
                         setSubmitted(false);
                         setLastSubmittedLead(null);
                       }}
-                      className="block text-xs font-semibold text-[#B46956] underline underline-offset-4 pt-1 cursor-pointer"
+                      className="block text-xs font-bold text-[#8C4332] underline underline-offset-4 pt-1 cursor-pointer"
                     >
                       {t.form.resetBtn}
                     </button>
                   </div>
                 ) : (
-                  <form onSubmit={handleSubmit} noValidate className="space-y-3.5">
-                    {/* Full Name */}
+                  <form onSubmit={handleSubmit} noValidate className="space-y-2.5">
+                    {/* Quick Single-Line Timeline Selector Pills */}
                     <div>
-                      <label
-                        htmlFor="full-name"
-                        className="block text-xs sm:text-sm font-semibold text-[#1C1918] mb-1"
-                      >
-                        {t.form.fullName} *
-                      </label>
-                      <input
-                        id="full-name"
-                        type="text"
-                        autoComplete="name"
-                        value={fullName}
-                        onChange={(e) => {
-                          setFullName(e.target.value);
-                          if (errors.name) setErrors({ ...errors, name: '' });
-                        }}
-                        placeholder={t.form.fullNamePlaceholder}
-                        className={`w-full min-h-[46px] px-3.5 py-2 rounded-xl border bg-white text-sm text-[#1C1918] placeholder:text-[#8E7F7A] focus:outline-none focus:ring-2 focus:ring-[#C47D6B] ${
-                          errors.name ? 'border-red-600' : 'border-[#CDBBB2]'
-                        }`}
-                      />
-                      {errors.name && (
-                        <p className="mt-1 text-xs text-red-700 flex items-center gap-1">
-                          <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-                          <span>{errors.name}</span>
-                        </p>
-                      )}
+                      <span className="block text-[11px] font-bold text-[#1C1918] mb-1">
+                        {t.form.timelineLabel}
+                      </span>
+                      <div className="grid grid-cols-3 gap-1.5">
+                        {t.form.timelines.map((tl, idx) => {
+                          const compactLabel = isRTL
+                            ? idx === 0
+                              ? 'أقرب وقت'
+                              : idx === 1
+                              ? '١ – ٣ أشهر'
+                              : 'الأسعار'
+                            : idx === 0
+                            ? 'ASAP'
+                            : idx === 1
+                            ? '1–3 Months'
+                            : 'Price Check';
+                          return (
+                            <button
+                              key={tl.value}
+                              type="button"
+                              onClick={() => setSelectedTimeline(tl.value)}
+                              className={`h-9 px-2 rounded-xl text-[11px] font-bold border transition-all cursor-pointer text-center whitespace-nowrap ${
+                                selectedTimeline === tl.value
+                                  ? 'bg-[#3D221C] text-white border-[#3D221C]'
+                                  : 'bg-[#FCF9F7] text-[#4A3F3B] border-[#E8C9C1] hover:border-[#B27262]'
+                              }`}
+                            >
+                              {compactLabel}
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
 
-                    {/* WhatsApp Number with Country Code */}
+                    {/* Row 1: Full Name & Country side-by-side */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      <div>
+                        <label
+                          htmlFor="full-name"
+                          className="block text-xs font-bold text-[#1C1918] mb-1"
+                        >
+                          {t.form.fullName} *
+                        </label>
+                        <input
+                          ref={fullNameInputRef}
+                          id="full-name"
+                          type="text"
+                          autoComplete="name"
+                          value={fullName}
+                          onChange={(e) => {
+                            setFullName(e.target.value);
+                            if (errors.name) setErrors({ ...errors, name: '' });
+                          }}
+                          placeholder={t.form.fullNamePlaceholder}
+                          className={`w-full h-[42px] px-3 rounded-xl border bg-white text-base sm:text-xs text-[#1C1918] placeholder:text-[#8E7F7A] focus:outline-none focus:ring-2 focus:ring-[#B27262] ${
+                            errors.name ? 'border-red-600' : 'border-[#DDB0A5]'
+                          }`}
+                        />
+                        {errors.name && (
+                          <p className="mt-0.5 text-[11px] text-red-700">{errors.name}</p>
+                        )}
+                      </div>
+
+                      <div>
+                        <label
+                          htmlFor="country"
+                          className="block text-xs font-bold text-[#1C1918] mb-1"
+                        >
+                          {t.form.country} *
+                        </label>
+                        <input
+                          id="country"
+                          type="text"
+                          autoComplete="country-name"
+                          value={country}
+                          onChange={(e) => {
+                            setCountry(e.target.value);
+                            if (errors.country) setErrors({ ...errors, country: '' });
+                          }}
+                          placeholder={t.form.countryPlaceholder}
+                          className={`w-full h-[42px] px-3 rounded-xl border bg-white text-base sm:text-xs text-[#1C1918] placeholder:text-[#8E7F7A] focus:outline-none focus:ring-2 focus:ring-[#B27262] ${
+                            errors.country ? 'border-red-600' : 'border-[#DDB0A5]'
+                          }`}
+                        />
+                        {errors.country && (
+                          <p className="mt-0.5 text-[11px] text-red-700">{errors.country}</p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Row 2: WhatsApp Number with Compact Flag+Code Selector */}
                     <div>
                       <label
                         htmlFor="whatsapp-phone"
-                        className="block text-xs sm:text-sm font-semibold text-[#1C1918] mb-1"
+                        className="block text-xs font-bold text-[#1C1918] mb-1"
                       >
                         {t.form.whatsapp} *
                       </label>
@@ -2377,10 +3355,10 @@ export function App() {
                           aria-label={t.form.countryCodeAria}
                           value={countryCode}
                           onChange={(e) => setCountryCode(e.target.value)}
-                          className="min-h-[46px] px-2.5 rounded-xl border border-[#CDBBB2] bg-[#FAF7F2] text-sm font-semibold text-[#1C1918] focus:outline-none focus:ring-2 focus:ring-[#C47D6B]"
+                          className="w-[106px] shrink-0 h-[42px] px-2 rounded-xl border border-[#DDB0A5] bg-[#FCF9F7] text-xs font-bold text-[#1C1918] focus:outline-none focus:ring-2 focus:ring-[#B27262]"
                         >
                           {COUNTRY_CODES.map((c) => (
-                            <option key={c.code} value={c.code}>
+                            <option key={c.id} value={c.code}>
                               {c.flag} {c.code}
                             </option>
                           ))}
@@ -2395,51 +3373,43 @@ export function App() {
                             if (errors.phone) setErrors({ ...errors, phone: '' });
                           }}
                           placeholder={t.form.whatsappPlaceholder}
-                          className={`flex-1 min-w-0 min-h-[46px] px-3.5 py-2 rounded-xl border bg-white text-sm text-[#1C1918] placeholder:text-[#8E7F7A] focus:outline-none focus:ring-2 focus:ring-[#C47D6B] ${
-                            errors.phone ? 'border-red-600' : 'border-[#CDBBB2]'
+                          className={`flex-1 min-w-0 h-[42px] px-3 rounded-xl border bg-white text-base sm:text-xs text-[#1C1918] placeholder:text-[#8E7F7A] focus:outline-none focus:ring-2 focus:ring-[#B27262] ${
+                            errors.phone ? 'border-red-600' : 'border-[#DDB0A5]'
                           }`}
                         />
                       </div>
                       {errors.phone && (
-                        <p className="mt-1 text-xs text-red-700 flex items-center gap-1">
-                          <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-                          <span>{errors.phone}</span>
-                        </p>
+                        <p className="mt-0.5 text-[11px] text-red-700">{errors.phone}</p>
                       )}
                     </div>
 
-                    {/* Country & Email */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <div>
+                    {/* Row 3: Interested Treatment & Optional Email */}
+                    <div className="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
+                      <div className="sm:col-span-7">
                         <label
-                          htmlFor="country"
-                          className="block text-xs sm:text-sm font-semibold text-[#1C1918] mb-1"
+                          htmlFor="interested-service"
+                          className="block text-xs font-bold text-[#1C1918] mb-1"
                         >
-                          {t.form.country} *
+                          {t.form.serviceLabel}
                         </label>
-                        <input
-                          id="country"
-                          type="text"
-                          autoComplete="country-name"
-                          value={country}
-                          onChange={(e) => {
-                            setCountry(e.target.value);
-                            if (errors.country) setErrors({ ...errors, country: '' });
-                          }}
-                          placeholder={t.form.countryPlaceholder}
-                          className={`w-full min-h-[46px] px-3.5 py-2 rounded-xl border bg-white text-sm text-[#1C1918] placeholder:text-[#8E7F7A] focus:outline-none focus:ring-2 focus:ring-[#C47D6B] ${
-                            errors.country ? 'border-red-600' : 'border-[#CDBBB2]'
-                          }`}
-                        />
-                        {errors.country && (
-                          <p className="mt-1 text-xs text-red-700">{errors.country}</p>
-                        )}
+                        <select
+                          id="interested-service"
+                          value={selectedServiceValue}
+                          onChange={(e) => setSelectedServiceValue(e.target.value)}
+                          className="w-full h-[42px] px-2.5 rounded-xl border border-[#DDB0A5] bg-white text-xs font-semibold text-[#1C1918] focus:outline-none focus:ring-2 focus:ring-[#B27262]"
+                        >
+                          {t.form.services.map((srv) => (
+                            <option key={srv.value} value={srv.value}>
+                              {srv.label}
+                            </option>
+                          ))}
+                        </select>
                       </div>
 
-                      <div>
+                      <div className="sm:col-span-5">
                         <label
                           htmlFor="email"
-                          className="block text-xs sm:text-sm font-semibold text-[#1C1918] mb-1"
+                          className="block text-xs font-bold text-[#1C1918] mb-1 truncate"
                         >
                           {t.form.email}
                         </label>
@@ -2453,58 +3423,36 @@ export function App() {
                             if (errors.email) setErrors({ ...errors, email: '' });
                           }}
                           placeholder={t.form.emailPlaceholder}
-                          className={`w-full min-h-[46px] px-3.5 py-2 rounded-xl border bg-white text-sm text-[#1C1918] placeholder:text-[#8E7F7A] focus:outline-none focus:ring-2 focus:ring-[#C47D6B] ${
-                            errors.email ? 'border-red-600' : 'border-[#CDBBB2]'
+                          className={`w-full h-[42px] px-3 rounded-xl border bg-white text-base sm:text-xs text-[#1C1918] placeholder:text-[#8E7F7A] focus:outline-none focus:ring-2 focus:ring-[#B27262] ${
+                            errors.email ? 'border-red-600' : 'border-[#DDB0A5]'
                           }`}
                         />
                         {errors.email && (
-                          <p className="mt-1 text-xs text-red-700">{errors.email}</p>
+                          <p className="mt-0.5 text-[11px] text-red-700">{errors.email}</p>
                         )}
                       </div>
                     </div>
 
-                    {/* Interested Service */}
-                    <div>
-                      <label
-                        htmlFor="interested-service"
-                        className="block text-xs sm:text-sm font-semibold text-[#1C1918] mb-1"
-                      >
-                        {t.form.serviceLabel}
-                      </label>
-                      <select
-                        id="interested-service"
-                        value={selectedServiceValue}
-                        onChange={(e) => setSelectedServiceValue(e.target.value)}
-                        className="w-full min-h-[46px] px-3.5 py-2 rounded-xl border border-[#CDBBB2] bg-white text-sm font-medium text-[#1C1918] focus:outline-none focus:ring-2 focus:ring-[#C47D6B]"
-                      >
-                        {t.form.services.map((srv) => (
-                          <option key={srv.value} value={srv.value}>
-                            {srv.label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    {/* Optional Message */}
+                    {/* Row 4: Compact Optional Notes */}
                     <div>
                       <label
                         htmlFor="message"
-                        className="block text-xs sm:text-sm font-semibold text-[#1C1918] mb-1"
+                        className="block text-xs font-bold text-[#1C1918] mb-1"
                       >
                         {t.form.message}
                       </label>
-                      <textarea
+                      <input
                         id="message"
-                        rows={2}
+                        type="text"
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
                         placeholder={t.form.messagePlaceholder}
-                        className="w-full px-3.5 py-2 rounded-xl border border-[#CDBBB2] bg-white text-sm text-[#1C1918] placeholder:text-[#8E7F7A] focus:outline-none focus:ring-2 focus:ring-[#C47D6B]"
+                        className="w-full h-[40px] px-3 rounded-xl border border-[#DDB0A5] bg-white text-base sm:text-xs text-[#1C1918] placeholder:text-[#8E7F7A] focus:outline-none focus:ring-2 focus:ring-[#B27262]"
                       />
                     </div>
 
                     {/* Privacy Consent */}
-                    <label className="flex items-start gap-2.5 text-xs text-[#5A4E4A] cursor-pointer pt-0.5">
+                    <label className="flex items-start gap-2 text-[11px] text-[#52443F] cursor-pointer pt-0.5">
                       <input
                         type="checkbox"
                         checked={consent}
@@ -2512,49 +3460,50 @@ export function App() {
                           setConsent(e.target.checked);
                           if (errors.consent) setErrors({ ...errors, consent: '' });
                         }}
-                        className="mt-0.5 h-4 w-4 rounded border-[#CDBBB2] accent-[#C47D6B]"
+                        className="mt-0.5 h-3.5 w-3.5 rounded border-[#DDB0A5] accent-[#9A4F3E]"
                       />
-                      <span>{t.form.consent}</span>
+                      <span className="leading-snug">{t.form.consent}</span>
                     </label>
                     {errors.consent && (
-                      <p className="text-xs text-red-700">{errors.consent}</p>
+                      <p className="text-[11px] text-red-700">{errors.consent}</p>
                     )}
 
-                    {/* Submit CTA */}
-                    <button
-                      type="submit"
-                      disabled={submitting}
-                      className="w-full min-h-[50px] inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-[#C47D6B] hover:bg-[#A86554] disabled:opacity-60 text-white font-bold text-sm sm:text-base shadow-sm transition-colors cursor-pointer"
-                    >
-                      {submitting ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          <span>{t.form.submitting}</span>
-                        </>
-                      ) : (
-                        <>
-                          <span>{t.form.submit}</span>
-                          {isRTL ? (
-                            <ArrowLeft className="w-4 h-4" />
-                          ) : (
-                            <ArrowRight className="w-4 h-4" />
-                          )}
-                        </>
-                      )}
-                    </button>
+                    {/* Submit CTA + WhatsApp Direct Row */}
+                    <div className="pt-1 space-y-2">
+                      <button
+                        type="submit"
+                        disabled={submitting}
+                        className="w-full h-[46px] inline-flex items-center justify-center gap-2 px-5 rounded-xl bg-[#9A4F3E] hover:bg-[#7D3D2E] disabled:opacity-60 text-white font-extrabold text-sm shadow-md transition-colors cursor-pointer"
+                      >
+                        {submitting ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            <span>{t.form.submitting}</span>
+                          </>
+                        ) : (
+                          <>
+                            <span>{t.form.submit}</span>
+                            {isRTL ? (
+                              <ArrowLeft className="w-4 h-4" />
+                            ) : (
+                              <ArrowRight className="w-4 h-4" />
+                            )}
+                          </>
+                        )}
+                      </button>
 
-                    {/* Direct WhatsApp Alternative */}
-                    <a
-                      href={defaultWaUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-full min-h-[44px] inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl border border-[#1E9E54]/35 bg-[#1E9E54]/8 hover:bg-[#1E9E54]/15 text-[#177A41] font-semibold text-xs sm:text-sm transition-colors"
-                    >
-                      <MessageCircle className="w-4 h-4" />
-                      <span>{t.form.whatsappDirect}</span>
-                    </a>
+                      <a
+                        href={defaultWaUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full h-[40px] inline-flex items-center justify-center gap-2 px-4 rounded-xl border border-[#157A3E]/35 bg-[#157A3E]/10 hover:bg-[#157A3E]/18 text-[#0F6934] font-bold text-xs transition-colors"
+                      >
+                        <MessageCircle className="w-3.5 h-3.5" />
+                        <span>{t.form.whatsappDirect}</span>
+                      </a>
+                    </div>
 
-                    <p className="text-[11px] text-center text-[#786A65] pt-0.5">
+                    <p className="text-[10px] text-center font-medium text-[#52443F]">
                       {t.form.note}
                     </p>
                   </form>
@@ -2564,39 +3513,150 @@ export function App() {
           </section>
 
           {/* =================================================================
-              SECTION 03 — MEDICAL TOURISM SUPPORT (SIMPLE ICONS ONLY)
-              VIP TRANSFER • ACCOMMODATION • BOOKING SERVICES
+              SECTION 02 — SIGNATURE DENTAL TREATMENTS & PACKAGES
           ================================================================== */}
           <section
-            aria-labelledby="tourism-heading"
-            className="bg-[#EFE7DD]/70 border-b border-[#E5D6CE] py-10 sm:py-12"
+            id="treatments"
+            aria-labelledby="treatments-heading"
+            className="py-12 sm:py-16 bg-white border-b border-[#E8C9C1] scroll-mt-20"
           >
-            <div className="max-w-[1180px] mx-auto px-4 sm:px-8 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
-              <div className="lg:col-span-3">
+            <div className="max-w-[1320px] mx-auto px-4 sm:px-8 space-y-8">
+              <div className="max-w-2xl space-y-2">
+                <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-[#8C4332]">
+                  {t.treatmentsSection.kicker}
+                </p>
                 <h2
-                  id="tourism-heading"
-                  className="text-2xl sm:text-3xl font-extrabold text-[#1C1918] tracking-tight"
+                  id="treatments-heading"
+                  className="text-2xl sm:text-4xl font-extrabold text-[#1C1918] tracking-tight"
                 >
-                  {t.tourism.heading}
+                  {t.treatmentsSection.heading}
                 </h2>
-                <p className="mt-1.5 text-xs sm:text-sm text-[#5A4E4A]">{t.tourism.sub}</p>
+                <p className="text-sm sm:text-base text-[#52443F] leading-relaxed">
+                  {t.treatmentsSection.sub}
+                </p>
               </div>
 
-              <div className="lg:col-span-9 grid grid-cols-1 sm:grid-cols-3 gap-6">
-                {t.tourism.items.map((item, idx) => {
-                  const Icon = idx === 0 ? Plane : idx === 1 ? Building2 : CalendarCheck;
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {t.treatmentsSection.items.map((pkg) => (
+                  <article
+                    key={pkg.value}
+                    className="luxury-card-hover rounded-3xl bg-[#FCF9F7] border border-[#E8C9C1] hover:border-[#B27262] p-5 sm:p-6 grid grid-cols-1 sm:grid-cols-12 gap-5 items-center"
+                  >
+                    {/* Left: Clinical Before & After Service Image */}
+                    <div className="sm:col-span-5 rounded-2xl bg-white border border-[#E8C9C1] p-2 overflow-hidden shadow-2xs">
+                      <img
+                        src={pkg.image}
+                        alt={pkg.title}
+                        width={500}
+                        height={500}
+                        loading="lazy"
+                        decoding="async"
+                        className="w-full aspect-square object-contain mx-auto block"
+                      />
+                    </div>
+
+                    {/* Right: Treatment Details & CTA */}
+                    <div className="sm:col-span-7 flex flex-col justify-between gap-4 h-full">
+                      <div className="space-y-3">
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <span className="px-2.5 py-0.5 rounded-full bg-[#3D221C] text-[#F5D6CC] text-[11px] font-bold">
+                            {pkg.badge}
+                          </span>
+                          <span className="px-2 py-0.5 rounded-md bg-white border border-[#E8C9C1] text-[#1C1918] text-[11px] font-bold">
+                            ⏱ {pkg.stay}
+                          </span>
+                          <span className="px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-200 text-[#0F6934] text-[11px] font-bold">
+                            ✓ {pkg.warranty}
+                          </span>
+                        </div>
+
+                        <div>
+                          <h3 className="text-lg sm:text-xl font-extrabold text-[#1C1918] leading-snug">
+                            {pkg.title}
+                          </h3>
+                          <p className="mt-1.5 text-xs text-[#4A3F3B] leading-relaxed">
+                            {pkg.desc}
+                          </p>
+                        </div>
+
+                        <ul className="space-y-1.5 pt-2 border-t border-[#E8C9C1]">
+                          {pkg.highlights.map((h) => (
+                            <li
+                              key={h}
+                              className="flex items-start gap-1.5 text-xs text-[#1C1918] font-medium"
+                            >
+                              <CheckCircle2 className="w-3.5 h-3.5 text-[#0F6934] shrink-0 mt-0.5" />
+                              <span>{h}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => handleSelectServiceAndScroll(pkg.value)}
+                        className="w-full min-h-[44px] inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-[#9A4F3E] hover:bg-[#7D3D2E] text-white font-bold text-xs transition-colors cursor-pointer shadow-xs"
+                      >
+                        <span>{t.treatmentsSection.ctaText}</span>
+                        {isRTL ? (
+                          <ArrowLeft className="w-3.5 h-3.5" />
+                        ) : (
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        )}
+                      </button>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* =================================================================
+              SECTION 03 — WHY INTERNATIONAL PATIENTS CHOOSE ESTELUX
+          ================================================================== */}
+          <section
+            id="why-estelux"
+            aria-labelledby="why-heading"
+            className="py-14 sm:py-20 bg-[#3D221C] text-[#FAF5F2] border-b border-[#5A352C] scroll-mt-20"
+          >
+            <div className="max-w-[1320px] mx-auto px-4 sm:px-8 space-y-10">
+              <div className="max-w-2xl space-y-2">
+                <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-[#F0C6BA]">
+                  {t.whyUs.kicker}
+                </p>
+                <h2
+                  id="why-heading"
+                  className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight"
+                >
+                  {t.whyUs.heading}
+                </h2>
+                <p className="text-sm sm:text-base text-[#F2DDD7] leading-relaxed">
+                  {t.whyUs.sub}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                {t.whyUs.items.map((item, idx) => {
+                  const Icon =
+                    idx === 0
+                      ? Sparkles
+                      : idx === 1
+                        ? ShieldCheck
+                        : idx === 2
+                          ? Stethoscope
+                          : HeartHandshake;
                   return (
                     <article
                       key={item.title}
-                      className="border-s border-[#D8C5BC] ps-5 flex flex-col gap-2"
+                      className="rounded-2xl bg-[#4E2C25] border border-[#6E4238] p-6 space-y-3.5 hover:border-[#DDB0A5] transition-colors"
                     >
-                      <div className="w-10 h-10 rounded-xl bg-white border border-[#E5D6CE] flex items-center justify-center shadow-2xs">
-                        <Icon className="w-5 h-5 text-[#C47D6B]" strokeWidth={1.9} />
+                      <div className="w-11 h-11 rounded-xl bg-[#B27262]/25 border border-[#DDB0A5]/45 flex items-center justify-center text-[#F5D6CC]">
+                        <Icon className="w-5 h-5" />
                       </div>
-                      <h3 className="text-sm font-bold tracking-wider uppercase text-[#1C1918] mt-1">
+                      <h3 className="text-base sm:text-lg font-extrabold text-white">
                         {item.title}
                       </h3>
-                      <p className="text-xs sm:text-sm text-[#4A3F3B] leading-relaxed">
+                      <p className="text-xs sm:text-sm text-[#F2DDD7] leading-relaxed">
                         {item.desc}
                       </p>
                     </article>
@@ -2607,16 +3667,208 @@ export function App() {
           </section>
 
           {/* =================================================================
-              SECTION 04 — SECONDARY MEDICAL SERVICES (NO ABOUT US)
+              SECTION 04 — 4-STEP PATIENT JOURNEY + VIP MEDICAL TOURISM SUPPORT
+          ================================================================== */}
+          <section
+            id="journey"
+            aria-labelledby="journey-heading"
+            className="py-14 sm:py-20 bg-[#EFE7DD]/65 border-b border-[#E5D6CE] scroll-mt-20"
+          >
+            <div className="max-w-[1320px] mx-auto px-4 sm:px-8 space-y-12">
+              <div className="max-w-2xl space-y-2">
+                <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-[#8C4332]">
+                  {t.journey.kicker}
+                </p>
+                <h2
+                  id="journey-heading"
+                  className="text-2xl sm:text-4xl font-extrabold text-[#1C1918] tracking-tight"
+                >
+                  {t.journey.heading}
+                </h2>
+                <p className="text-sm sm:text-base text-[#5A4E4A] leading-relaxed">
+                  {t.journey.sub}
+                </p>
+              </div>
+
+              {/* 4-Step Timeline Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                {t.journey.steps.map((step) => (
+                  <div
+                    key={step.num}
+                    className="bg-white rounded-2xl border border-[#E5D6CE] p-6 space-y-3 shadow-2xs relative"
+                  >
+                    <span className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-[#9A4F3E] text-white font-extrabold text-sm">
+                      {step.num}
+                    </span>
+                    <h3 className="text-base font-extrabold text-[#1C1918]">{step.title}</h3>
+                    <p className="text-xs sm:text-sm text-[#5A4E4A] leading-relaxed">
+                      {step.desc}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              {/* VIP Medical Travel Pillars */}
+              <div className="bg-white rounded-3xl border border-[#E5D6CE] p-6 sm:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center shadow-2xs">
+                <div className="lg:col-span-4 space-y-1.5">
+                  <h3 className="text-xl sm:text-2xl font-extrabold text-[#1C1918] tracking-tight">
+                    {t.tourism.heading}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-[#5A4E4A] leading-relaxed">
+                    {t.tourism.sub}
+                  </p>
+                </div>
+
+                <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-6">
+                  {t.tourism.items.map((item, idx) => {
+                    const Icon = idx === 0 ? Plane : idx === 1 ? Building2 : CalendarCheck;
+                    return (
+                      <article
+                        key={item.title}
+                        className="border-s-2 border-[#C47D6B]/40 ps-4 flex flex-col gap-2"
+                      >
+                        <div className="w-10 h-10 rounded-xl bg-[#FAF7F2] border border-[#E5D6CE] flex items-center justify-center">
+                          <Icon className="w-5 h-5 text-[#C47D6B]" strokeWidth={1.9} />
+                        </div>
+                        <h4 className="text-xs sm:text-sm font-extrabold tracking-wider uppercase text-[#1C1918] mt-1">
+                          {item.title}
+                        </h4>
+                        <p className="text-xs text-[#4A3F3B] leading-relaxed">{item.desc}</p>
+                      </article>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* =================================================================
+              SECTION 05 — VERIFIED INTERNATIONAL PATIENT REVIEWS
+          ================================================================== */}
+          <section
+            id="reviews"
+            aria-labelledby="reviews-heading"
+            className="py-14 sm:py-20 bg-white border-b border-[#E5D6CE] scroll-mt-20"
+          >
+            <div className="max-w-[1320px] mx-auto px-4 sm:px-8 space-y-10">
+              <div className="max-w-2xl space-y-2">
+                <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-[#8C4332]">
+                  {t.reviews.kicker}
+                </p>
+                <h2
+                  id="reviews-heading"
+                  className="text-2xl sm:text-4xl font-extrabold text-[#1C1918] tracking-tight"
+                >
+                  {t.reviews.heading}
+                </h2>
+                <p className="text-sm sm:text-base text-[#5A4E4A] leading-relaxed">
+                  {t.reviews.sub}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {t.reviews.items.map((rev) => (
+                  <article
+                    key={rev.name}
+                    className="rounded-2xl bg-[#FAF7F2] border border-[#E5D6CE] p-6 flex flex-col justify-between gap-4 shadow-2xs"
+                  >
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-1 text-amber-500">
+                          {[...Array(5)].map((_, i) => (
+                            <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                          ))}
+                        </div>
+                        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#1E9E54] bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
+                          <BadgeCheck className="w-3.5 h-3.5" />
+                          <span>{t.reviews.verifiedLabel}</span>
+                        </span>
+                      </div>
+                      <p className="text-xs sm:text-sm text-[#1C1918] leading-relaxed italic">
+                        "{rev.quote}"
+                      </p>
+                    </div>
+
+                    <div className="pt-3 border-t border-[#E5D6CE] flex items-center justify-between gap-2 text-xs">
+                      <div>
+                        <p className="font-extrabold text-[#1C1918]">{rev.name}</p>
+                        <p className="text-[#6E605B] font-medium">{rev.country}</p>
+                      </div>
+                      <span className="px-2.5 py-1 rounded-lg bg-white border border-[#E5D6CE] font-bold text-[#8C4332]">
+                        {rev.treatment}
+                      </span>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* =================================================================
+              SECTION 06 — FREQUENTLY ASKED QUESTIONS (ACCORDION)
+          ================================================================== */}
+          <section
+            id="faq"
+            aria-labelledby="faq-heading"
+            className="py-14 sm:py-20 bg-[#FAF7F2] border-b border-[#E5D6CE] scroll-mt-20"
+          >
+            <div className="max-w-[920px] mx-auto px-4 sm:px-8 space-y-8">
+              <div className="text-center space-y-2">
+                <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-[#8C4332]">
+                  {t.faq.kicker}
+                </p>
+                <h2
+                  id="faq-heading"
+                  className="text-2xl sm:text-4xl font-extrabold text-[#1C1918] tracking-tight"
+                >
+                  {t.faq.heading}
+                </h2>
+                <p className="text-sm text-[#5A4E4A]">{t.faq.sub}</p>
+              </div>
+
+              <div className="space-y-3">
+                {t.faq.items.map((item, idx) => {
+                  const isOpen = openFaqIndex === idx;
+                  return (
+                    <div
+                      key={item.q}
+                      className="rounded-2xl bg-white border border-[#E5D6CE] overflow-hidden shadow-2xs"
+                    >
+                      <button
+                        type="button"
+                        aria-expanded={isOpen}
+                        onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
+                        className="w-full px-5 py-4 text-start flex items-center justify-between gap-4 font-bold text-sm sm:text-base text-[#1C1918] hover:text-[#C47D6B] transition-colors cursor-pointer"
+                      >
+                        <span>{item.q}</span>
+                        <ChevronDown
+                          className={`w-5 h-5 text-[#C47D6B] shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''
+                            }`}
+                        />
+                      </button>
+                      {isOpen && (
+                        <div className="px-5 pb-5 pt-1 text-xs sm:text-sm text-[#4A3F3B] leading-relaxed border-t border-[#FAF7F2]">
+                          {item.a}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </section>
+
+          {/* =================================================================
+              SECTION 07 — SECONDARY MEDICAL SERVICES (HAIR, PLASTIC, SPINE)
           ================================================================== */}
           <section
             id="services"
             aria-labelledby="services-heading"
-            className="py-14 sm:py-16 scroll-mt-20"
+            className="py-14 sm:py-16 bg-white border-b border-[#E5D6CE] scroll-mt-20"
           >
-            <div className="max-w-[1180px] mx-auto px-4 sm:px-8">
+            <div className="max-w-[1320px] mx-auto px-4 sm:px-8">
               <div className="max-w-xl">
-                <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#B46956] mb-1.5">
+                <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#8C4332] mb-1.5">
                   {t.services.kicker}
                 </p>
                 <h2
@@ -2628,24 +3880,24 @@ export function App() {
                 <p className="mt-1.5 text-sm text-[#5A4E4A]">{t.services.sub}</p>
               </div>
 
-              <div className="mt-7 grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="mt-7 grid grid-cols-1 md:grid-cols-3 gap-5">
                 {t.services.items.map((srv) => (
                   <article
                     key={srv.value}
-                    className="p-5 sm:p-6 rounded-2xl bg-white border border-[#E5D6CE] hover:border-[#C47D6B] transition-colors flex flex-col justify-between gap-4"
+                    className="luxury-card-hover p-6 rounded-2xl bg-[#FAF7F2] border border-[#E5D6CE] hover:border-[#C47D6B] flex flex-col justify-between gap-4"
                   >
                     <div>
-                      <h3 className="text-base sm:text-lg font-bold text-[#1C1918]">
+                      <h3 className="text-base sm:text-lg font-extrabold text-[#1C1918]">
                         {srv.title}
                       </h3>
-                      <p className="mt-1.5 text-xs sm:text-sm text-[#5A4E4A] leading-relaxed">
+                      <p className="mt-2 text-xs sm:text-sm text-[#5A4E4A] leading-relaxed">
                         {srv.desc}
                       </p>
                     </div>
                     <button
                       type="button"
                       onClick={() => handleSelectServiceAndScroll(srv.value)}
-                      className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#B46956] hover:text-[#1C1918] underline underline-offset-4 self-start cursor-pointer"
+                      className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#8C4332] hover:text-[#1C1918] underline underline-offset-4 self-start cursor-pointer"
                     >
                       <span>{srv.linkText}</span>
                       <ArrowUpRight className="w-4 h-4" />
@@ -2655,20 +3907,65 @@ export function App() {
               </div>
             </div>
           </section>
+
+          {/* =================================================================
+              SECTION 08 — PRE-FOOTER CONVERSION BANNER
+          ================================================================== */}
+          <section className="py-12 sm:py-16 bg-gradient-to-r from-[#3D221C] via-[#4E2C25] to-[#3D221C] text-white">
+            <div className="max-w-[1320px] mx-auto px-4 sm:px-8 flex flex-col lg:flex-row items-center justify-between gap-6 text-center lg:text-start">
+              <div className="space-y-2 max-w-2xl">
+                <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-[#F0C6BA]">
+                  {t.ctaBanner.kicker}
+                </p>
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-white">
+                  {t.ctaBanner.heading}
+                </h2>
+                <p className="text-xs sm:text-sm text-[#F2DDD7] leading-relaxed">
+                  {t.ctaBanner.sub}
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center justify-center gap-3 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => handleSelectServiceAndScroll('hollywood')}
+                  className="min-h-[48px] px-6 py-3 rounded-xl bg-[#9A4F3E] hover:bg-[#7D3D2E] text-white font-bold text-sm transition-colors cursor-pointer"
+                >
+                  {t.ctaBanner.primaryBtn}
+                </button>
+                <a
+                  href={defaultWaUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="min-h-[48px] px-6 py-3 rounded-xl bg-[#157A3E] hover:bg-[#198747] text-white font-bold text-sm inline-flex items-center gap-2 transition-colors"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  <span>{t.ctaBanner.waBtn}</span>
+                </a>
+              </div>
+            </div>
+          </section>
         </main>
       )}
 
       {/* =====================================================================
-          MINIMAL FOOTER (NO PUBLIC DASHBOARD LINK)
+          MINIMAL FOOTER
       ====================================================================== */}
-      <footer className="border-t border-[#E5D6CE] bg-[#FAF7F2] py-6 pb-20 sm:pb-6">
-        <div className="max-w-[1180px] mx-auto px-4 sm:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#786A65]">
+      <footer className="border-t border-[#E8C9C1] bg-[#FCF9F7] py-6 pb-20 sm:pb-6">
+        <div className="max-w-[1320px] mx-auto px-4 sm:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#52443F]">
           <div className="flex items-center gap-3">
-            <div className="bg-[#0B0A0A] rounded-md px-2 py-1">
+            <div className="bg-white border border-[#E8C9C1] rounded-lg px-2 py-1 shadow-2xs">
               <img
                 src={brandLogo}
                 alt="ESTELUX"
-                className="h-7 w-auto object-contain block"
+                width={54}
+                height={42}
+                loading="lazy"
+                decoding="async"
+                onError={(e) => {
+                  e.currentTarget.src = DEFAULT_ASSETS.logo;
+                }}
+                className="h-9 w-auto object-contain block"
               />
             </div>
             <span className="font-semibold text-[#1C1918]">{t.footer.slogan}</span>
@@ -2695,19 +3992,20 @@ export function App() {
             </button>
 
             <span>{t.footer.rights}</span>
-             <span>{t.footer.rights}</span>
 
-        <span className="text-[#CDBBB2]" aria-hidden="true">•</span>
+            <span className="text-[#CDBBB2]" aria-hidden="true">
+              •
+            </span>
 
-        <a
-          href="https://threedigitsoftware.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="font-semibold text-[#5A4E4A] hover:text-[#C47D6B] transition-colors"
-        >
-          {isRTL ? 'تطوير: ' : 'Powered by '}
-          <span className="underline underline-offset-4">threedigitsoftware.com</span>
-        </a>
+            <a
+              href="https://threedigitsoftware.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-[#5A4E4A] hover:text-[#C47D6B] transition-colors"
+            >
+              {isRTL ? 'تطوير: ' : 'Powered by '}
+              <span className="underline underline-offset-4">Threedigitsoftware.com</span>
+            </a>
           </div>
         </div>
       </footer>
@@ -2722,7 +4020,7 @@ export function App() {
             target="_blank"
             rel="noopener noreferrer"
             aria-label={t.nav.whatsappAria}
-            className="hidden sm:inline-flex fixed bottom-6 end-6 z-40 items-center gap-2.5 px-4 py-3 rounded-full bg-[#1E9E54] hover:bg-[#198747] text-white font-semibold text-sm shadow-lg transition-transform hover:scale-[1.03]"
+            className="hidden sm:inline-flex fixed bottom-6 end-6 z-40 items-center gap-2.5 px-4 py-3 rounded-full bg-[#157A3E] hover:bg-[#198747] text-white font-bold text-sm shadow-lg transition-transform hover:scale-[1.03]"
           >
             <MessageCircle className="w-5 h-5" />
             <span>{t.nav.whatsapp}</span>
@@ -2731,7 +4029,11 @@ export function App() {
           <div className="sm:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-[#E5D6CE] px-3 py-2 flex items-center gap-2">
             <a
               href="#consultation"
-              className="flex-1 min-h-[42px] inline-flex items-center justify-center rounded-xl bg-[#C47D6B] text-white font-bold text-xs"
+              onClick={(e) => {
+                e.preventDefault();
+                handleSelectServiceAndScroll(selectedServiceValue);
+              }}
+              className="flex-1 min-h-[42px] inline-flex items-center justify-center rounded-xl bg-[#9A4F3E] text-white font-bold text-xs"
             >
               {t.form.heading}
             </a>
@@ -2739,7 +4041,7 @@ export function App() {
               href={defaultWaUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="min-h-[42px] px-3.5 inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#1E9E54] text-white font-semibold text-xs"
+              className="min-h-[42px] px-3.5 inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#157A3E] text-white font-bold text-xs"
             >
               <MessageCircle className="w-4 h-4" />
               <span>{t.nav.whatsapp}</span>
@@ -2762,14 +4064,14 @@ export function App() {
             onClick={(e) => e.stopPropagation()}
             className="relative max-w-2xl w-full rounded-2xl bg-white overflow-hidden shadow-2xl border border-[#E5D6CE]"
           >
-            <div className="flex items-center justify-between px-4 py-3 border-b border-[#E5D6CE] bg-[#FAF7F2]">
+            <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#E5D6CE] bg-[#FAF7F2]">
               <div>
-                <p className="text-xs font-bold text-[#B46956]">
+                <p className="text-xs font-bold text-[#8C4332]">
                   {isRTL
                     ? filteredCases[lightboxIndex].tagAr
                     : filteredCases[lightboxIndex].tagEn}
                 </p>
-                <h3 className="text-sm font-bold text-[#1C1918]">
+                <h3 className="text-sm sm:text-base font-extrabold text-[#1C1918]">
                   {isRTL
                     ? filteredCases[lightboxIndex].titleAr
                     : filteredCases[lightboxIndex].titleEn}
@@ -2785,7 +4087,7 @@ export function App() {
               </button>
             </div>
 
-            <div className="relative bg-white flex items-center justify-center max-h-[72vh] overflow-hidden">
+            <div className="relative bg-white p-2 flex items-center justify-center max-h-[68vh] overflow-hidden">
               <img
                 src={filteredCases[lightboxIndex].src}
                 alt={
@@ -2793,7 +4095,10 @@ export function App() {
                     ? filteredCases[lightboxIndex].titleAr
                     : filteredCases[lightboxIndex].titleEn
                 }
-                className="max-h-[70vh] w-auto object-contain"
+                onError={(e) => {
+                  e.currentTarget.src = DEFAULT_ASSETS.case1;
+                }}
+                className="max-h-[65vh] w-auto object-contain"
               />
               {filteredCases.length > 1 && (
                 <>
@@ -2807,7 +4112,11 @@ export function App() {
                     }
                     className="absolute start-3 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-white/90 hover:bg-white border border-[#E5D6CE] shadow-md text-[#1C1918] cursor-pointer"
                   >
-                    <ChevronLeft className="w-5 h-5" />
+                    {isRTL ? (
+                      <ChevronRight className="w-5 h-5" />
+                    ) : (
+                      <ChevronLeft className="w-5 h-5" />
+                    )}
                   </button>
                   <button
                     type="button"
@@ -2815,27 +4124,39 @@ export function App() {
                     onClick={() => setLightboxIndex((lightboxIndex + 1) % filteredCases.length)}
                     className="absolute end-3 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-white/90 hover:bg-white border border-[#E5D6CE] shadow-md text-[#1C1918] cursor-pointer"
                   >
-                    <ChevronRight className="w-5 h-5" />
+                    {isRTL ? (
+                      <ChevronLeft className="w-5 h-5" />
+                    ) : (
+                      <ChevronRight className="w-5 h-5" />
+                    )}
                   </button>
                 </>
               )}
             </div>
 
-            <div className="px-4 py-3 bg-[#FAF7F2] border-t border-[#E5D6CE] flex items-center justify-between gap-3">
-              <span className="text-xs text-[#5A4E4A]">
-                {formatCaseLabel(lightboxIndex)} /{' '}
-                {isRTL ? toArabicDigits(filteredCases.length) : filteredCases.length}
-              </span>
-              <button
-                type="button"
-                onClick={() => {
-                  setLightboxIndex(null);
-                  handleSelectServiceAndScroll('dental');
-                }}
-                className="px-4 py-2 rounded-lg bg-[#C47D6B] hover:bg-[#A86554] text-white text-xs font-bold cursor-pointer"
-              >
-                {t.lightbox.cta}
-              </button>
+            <div className="px-5 py-4 bg-[#FAF7F2] border-t border-[#E5D6CE] space-y-3">
+              <p className="text-xs sm:text-sm text-[#4A3F3B] leading-relaxed">
+                {isRTL
+                  ? filteredCases[lightboxIndex].captionAr
+                  : filteredCases[lightboxIndex].captionEn}
+              </p>
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-xs font-semibold text-[#52443F]">
+                  {formatCaseLabel(lightboxIndex)} /{' '}
+                  {isRTL ? toArabicDigits(filteredCases.length) : filteredCases.length}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const cat = filteredCases[lightboxIndex].category;
+                    setLightboxIndex(null);
+                    handleSelectServiceAndScroll(cat === 'hollywood' ? 'hollywood' : 'zirconia');
+                  }}
+                  className="px-4 py-2 rounded-xl bg-[#9A4F3E] hover:bg-[#7D3D2E] text-white text-xs font-bold cursor-pointer"
+                >
+                  {t.lightbox.cta}
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -2846,6 +4167,8 @@ export function App() {
       ====================================================================== */}
       {pinModalOpen && (
         <div
+          role="dialog"
+          aria-modal="true"
           onClick={() => setPinModalOpen(false)}
           className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4"
         >
@@ -2933,7 +4256,7 @@ export function App() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-xl bg-[#C47D6B] hover:bg-[#A86554] text-white text-xs font-bold cursor-pointer"
+                  className="px-4 py-2 rounded-xl bg-[#9A4F3E] hover:bg-[#7D3D2E] text-white text-xs font-bold cursor-pointer"
                 >
                   {t.admin.pinModal.saveBtn}
                 </button>
@@ -2948,6 +4271,8 @@ export function App() {
       ====================================================================== */}
       {privacyOpen && (
         <div
+          role="dialog"
+          aria-modal="true"
           onClick={() => setPrivacyOpen(false)}
           className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4"
         >
