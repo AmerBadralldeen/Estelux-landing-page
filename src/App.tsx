@@ -3041,6 +3041,42 @@ export function App() {
                   </div>
                 ) : (
                   <form onSubmit={handleSubmit} noValidate className="space-y-4">
+                    {/* Quick Single-Line Timeline Selector Pills */}
+                    <div>
+                      <span className="block text-xs font-bold text-[#1C1918] mb-1.5">
+                        {t.form.timelineLabel}
+                      </span>
+                      <div className="grid grid-cols-3 gap-2">
+                        {t.form.timelines.map((tl, idx) => {
+                          const compactLabel = isRTL
+                            ? idx === 0
+                              ? 'أقرب وقت'
+                              : idx === 1
+                              ? '١ – ٣ أشهر'
+                              : 'الأسعار'
+                            : idx === 0
+                            ? 'ASAP'
+                            : idx === 1
+                            ? '1–3 Months'
+                            : 'Price Check';
+                          return (
+                            <button
+                              key={tl.value}
+                              type="button"
+                              onClick={() => setSelectedTimeline(tl.value)}
+                              className={`h-10 px-2 rounded-xl text-xs font-bold border transition-all cursor-pointer text-center whitespace-nowrap ${
+                                selectedTimeline === tl.value
+                                  ? 'bg-[#3D221C] text-white border-[#3D221C]'
+                                  : 'bg-[#FCF9F7] text-[#4A3F3B] border-[#E8C9C1] hover:border-[#B27262]'
+                              }`}
+                            >
+                              {compactLabel}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
                     {/* Full Name & Country */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                       <div>
@@ -3534,6 +3570,56 @@ export function App() {
                     </div>
                   );
                 })}
+              </div>
+            </div>
+          </section>
+
+          {/* =================================================================
+              SECTION 07 — ADDITIONAL MEDICAL SPECIALTIES (HAIR, PLASTIC, SPINE)
+          ================================================================== */}
+          <section
+            id="services"
+            aria-labelledby="services-heading"
+            className="py-14 sm:py-16 bg-[#FCF9F7] border-t border-[#E8C9C1] scroll-mt-20"
+          >
+            <div className="max-w-[1200px] mx-auto px-4 sm:px-8">
+              <div className="max-w-xl">
+                <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#8C4332] mb-1.5">
+                  {t.services.kicker}
+                </p>
+                <h2
+                  id="services-heading"
+                  className="text-2xl sm:text-3xl font-extrabold text-[#1C1918] tracking-tight"
+                >
+                  {t.services.heading}
+                </h2>
+                <p className="mt-1.5 text-sm text-[#52443F]">{t.services.sub}</p>
+              </div>
+
+              <div className="mt-7 grid grid-cols-1 md:grid-cols-3 gap-5">
+                {t.services.items.map((srv) => (
+                  <article
+                    key={srv.value}
+                    className="luxury-card-hover p-6 rounded-2xl bg-white border border-[#E8C9C1] hover:border-[#B27262] flex flex-col justify-between gap-4"
+                  >
+                    <div>
+                      <h3 className="text-base sm:text-lg font-extrabold text-[#1C1918]">
+                        {srv.title}
+                      </h3>
+                      <p className="mt-2 text-xs sm:text-sm text-[#52443F] leading-relaxed">
+                        {srv.desc}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleSelectServiceAndScroll(srv.value)}
+                      className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#8C4332] hover:text-[#1C1918] underline underline-offset-4 self-start cursor-pointer"
+                    >
+                      <span>{srv.linkText}</span>
+                      <ArrowUpRight className="w-4 h-4" />
+                    </button>
+                  </article>
+                ))}
               </div>
             </div>
           </section>
