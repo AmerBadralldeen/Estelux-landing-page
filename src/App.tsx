@@ -1799,49 +1799,10 @@ export function App() {
       )}
 
       {/* =====================================================================
-          TOP TRUST & CREDIBILITY BAR (PUBLIC LANDING VIEW)
+          STICKY MINIMAL LUXURY HEADER (PUBLIC SITE & ADMIN MODE)
       ====================================================================== */}
-      {view === 'landing' && (
-        <div className="bg-[#3D221C] text-[#FAF5F2] border-b border-[#5A352C] text-[11px] sm:text-xs py-2 px-4">
-          <div className="max-w-[1320px] mx-auto sm:px-4 flex items-center justify-between gap-4 whitespace-nowrap overflow-x-auto">
-            <div className="flex items-center gap-5">
-              <span className="inline-flex items-center gap-1.5 font-medium">
-                <ShieldCheck className="w-3.5 h-3.5 text-[#F0C6BA] shrink-0" />
-                <span>{t.topBar.accredited}</span>
-              </span>
-              <span className="hidden md:inline-flex items-center gap-1.5 font-medium text-[#F2DDD7]">
-                <Award className="w-3.5 h-3.5 text-[#F0C6BA] shrink-0" />
-                <span>{t.topBar.materials}</span>
-              </span>
-              <span className="hidden xl:inline-flex items-center gap-1.5 font-medium text-[#F2DDD7]">
-                <BadgeCheck className="w-3.5 h-3.5 text-[#5CE68B] shrink-0" />
-                <span>{t.topBar.warranty}</span>
-              </span>
-            </div>
-
-            <div className="flex items-center gap-3 ms-auto shrink-0">
-              <a
-                href={defaultWaUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-[#F0C6BA] hover:text-white font-semibold transition-colors"
-              >
-                <span className="w-2 h-2 rounded-full bg-[#2AD16D] animate-pulse-subtle shrink-0" />
-                <span className="hidden sm:inline">{t.topBar.onlineNow}:</span>
-                <span dir="ltr" className="font-bold text-white">
-                  {WHATSAPP_DISPLAY}
-                </span>
-              </a>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* =====================================================================
-          STICKY LUXURY HEADER (PUBLIC SITE & ADMIN MODE)
-      ====================================================================== */}
-      <header className="sticky top-0 z-40 bg-[#FCF9F7]/95 backdrop-blur-md border-b border-[#E8C9C1] shadow-2xs">
-        <div className="max-w-[1320px] mx-auto px-4 sm:px-8 h-[74px] flex items-center justify-between gap-4">
+      <header className="sticky top-0 z-40 bg-[#FCF9F7]/95 backdrop-blur-md border-b border-[#E8C9C1]">
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-8 h-[74px] flex items-center justify-between gap-4">
           {/* ESTELUX Horizontal Brand Lockup */}
           <a
             href="#top"
@@ -1854,12 +1815,12 @@ export function App() {
             aria-label={t.nav.homeAria}
             className="inline-flex items-center gap-2.5 sm:gap-3 group focus:outline-none shrink-0"
           >
-            <div className="bg-white rounded-xl px-2 py-1 shadow-2xs border border-[#E8C9C1] flex items-center justify-center shrink-0">
+            <div className="bg-white rounded-xl px-2 py-1 border border-[#E8C9C1] flex items-center justify-center shrink-0">
               <img
                 src={brandLogo === DEFAULT_ASSETS.logo ? '/estelux-emblem.png' : brandLogo}
                 alt={t.nav.logoAlt}
-                width={52}
-                height={41}
+                width={48}
+                height={38}
                 decoding="async"
                 onError={(e) => {
                   const target = e.currentTarget;
@@ -1867,65 +1828,41 @@ export function App() {
                     target.src = DEFAULT_ASSETS.logo;
                   }
                 }}
-                className="h-9 sm:h-10 w-auto object-contain block"
+                className="h-9 w-auto object-contain block"
               />
             </div>
             <div className="flex flex-col">
               <span className="text-sm sm:text-base font-extrabold tracking-[0.26em] text-[#9E5B4B] leading-none">
                 ESTELUX
               </span>
-              <span className="text-[10px] sm:text-[11px] font-semibold tracking-[0.06em] text-[#6B504A] mt-1 whitespace-nowrap">
+              <span className="text-[10px] sm:text-[11px] font-medium tracking-[0.04em] text-[#6B504A] mt-1 whitespace-nowrap">
                 {t.brandSubtitle}
               </span>
             </div>
           </a>
 
-          {/* Desktop Quick Section Navigation (Single-Line No-Wrap) */}
+          {/* Desktop Clean Section Navigation */}
           {view === 'landing' && (
             <nav
               aria-label="Primary Navigation"
-              className="hidden xl:flex items-center gap-6 text-[13px] font-bold text-[#3B2A26] whitespace-nowrap"
+              className="hidden lg:flex items-center gap-7 text-[13px] font-semibold text-[#3B2A26] whitespace-nowrap"
             >
-              <a
-                href="#treatments"
-                className="hover:text-[#9A4F3E] transition-colors py-1"
-              >
-                {t.nav.treatments}
-              </a>
-              <a
-                href="#gallery"
-                className="hover:text-[#9A4F3E] transition-colors py-1"
-              >
+              <a href="#gallery" className="hover:text-[#9A4F3E] transition-colors py-1">
                 {t.nav.gallery}
               </a>
-              <a
-                href="#why-estelux"
-                className="hover:text-[#9A4F3E] transition-colors py-1"
-              >
-                {t.nav.whyUs}
+              <a href="#treatments" className="hover:text-[#9A4F3E] transition-colors py-1">
+                {t.nav.treatments}
               </a>
-              <a
-                href="#journey"
-                className="hover:text-[#9A4F3E] transition-colors py-1"
-              >
+              <a href="#journey" className="hover:text-[#9A4F3E] transition-colors py-1">
                 {t.nav.journey}
               </a>
-              <a
-                href="#reviews"
-                className="hover:text-[#9A4F3E] transition-colors py-1"
-              >
-                {t.nav.reviews}
-              </a>
-              <a
-                href="#faq"
-                className="hover:text-[#9A4F3E] transition-colors py-1"
-              >
+              <a href="#faq" className="hover:text-[#9A4F3E] transition-colors py-1">
                 {t.nav.faq}
               </a>
             </nav>
           )}
 
-          {/* Right Controls (Single-Line No-Wrap) */}
+          {/* Right Controls */}
           <div className="flex items-center gap-2 shrink-0 whitespace-nowrap">
             {view !== 'landing' && (
               <button
@@ -1950,21 +1887,14 @@ export function App() {
             {view === 'landing' && (
               <>
                 <a
-                  href="#consultation"
-                  className="hidden sm:inline-flex items-center justify-center h-10 px-4 rounded-xl bg-[#9A4F3E] hover:bg-[#7D3D2E] text-white text-xs font-bold shadow-2xs transition-colors whitespace-nowrap"
-                >
-                  <span>{t.nav.freeQuote}</span>
-                </a>
-
-                <a
                   href={defaultWaUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={t.nav.whatsappAria}
-                  className="inline-flex items-center justify-center gap-1.5 h-10 px-3.5 sm:px-4 rounded-xl bg-[#157A3E] hover:bg-[#106231] text-white text-xs font-bold shadow-2xs transition-colors whitespace-nowrap"
+                  className="inline-flex items-center justify-center gap-1.5 h-10 px-3.5 sm:px-4 rounded-xl bg-[#157A3E] hover:bg-[#106231] text-white text-xs font-bold transition-colors whitespace-nowrap"
                 >
                   <MessageCircle className="w-3.5 h-3.5 shrink-0" />
-                  <span className="hidden md:inline">{t.nav.whatsapp}</span>
+                  <span className="hidden sm:inline">{t.nav.whatsapp}</span>
                 </a>
 
                 <button
@@ -1972,7 +1902,7 @@ export function App() {
                   onClick={() => setMobileMenuOpen((prev) => !prev)}
                   aria-label="Toggle Menu"
                   aria-expanded={mobileMenuOpen}
-                  className="xl:hidden inline-flex items-center justify-center w-10 h-10 rounded-xl border border-[#DDB0A5] bg-white text-[#1C1918] cursor-pointer shrink-0"
+                  className="lg:hidden inline-flex items-center justify-center w-10 h-10 rounded-xl border border-[#DDB0A5] bg-white text-[#1C1918] cursor-pointer shrink-0"
                 >
                   {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
                 </button>
@@ -1983,69 +1913,44 @@ export function App() {
 
         {/* Mobile Drawer Navigation */}
         {view === 'landing' && mobileMenuOpen && (
-          <div className="lg:hidden bg-white border-t border-[#E5D6CE] px-4 py-4 space-y-2 shadow-lg">
+          <div className="lg:hidden bg-white border-t border-[#E8C9C1] px-4 py-4 space-y-3 shadow-lg">
             <div className="grid grid-cols-2 gap-2 text-xs font-bold text-[#1C1918]">
-              <a
-                href="#treatments"
-                onClick={() => setMobileMenuOpen(false)}
-                className="p-2.5 rounded-xl bg-[#FAF7F2] hover:bg-[#EFE7DD]"
-              >
-                {t.nav.treatments}
-              </a>
               <a
                 href="#gallery"
                 onClick={() => setMobileMenuOpen(false)}
-                className="p-2.5 rounded-xl bg-[#FAF7F2] hover:bg-[#EFE7DD]"
+                className="p-2.5 rounded-xl bg-[#FCF9F7] hover:bg-[#F7EAE6]"
               >
                 {t.nav.gallery}
               </a>
               <a
-                href="#why-estelux"
+                href="#treatments"
                 onClick={() => setMobileMenuOpen(false)}
-                className="p-2.5 rounded-xl bg-[#FAF7F2] hover:bg-[#EFE7DD]"
+                className="p-2.5 rounded-xl bg-[#FCF9F7] hover:bg-[#F7EAE6]"
               >
-                {t.nav.whyUs}
+                {t.nav.treatments}
               </a>
               <a
                 href="#journey"
                 onClick={() => setMobileMenuOpen(false)}
-                className="p-2.5 rounded-xl bg-[#FAF7F2] hover:bg-[#EFE7DD]"
+                className="p-2.5 rounded-xl bg-[#FCF9F7] hover:bg-[#F7EAE6]"
               >
                 {t.nav.journey}
               </a>
               <a
-                href="#reviews"
-                onClick={() => setMobileMenuOpen(false)}
-                className="p-2.5 rounded-xl bg-[#FAF7F2] hover:bg-[#EFE7DD]"
-              >
-                {t.nav.reviews}
-              </a>
-              <a
                 href="#faq"
                 onClick={() => setMobileMenuOpen(false)}
-                className="p-2.5 rounded-xl bg-[#FAF7F2] hover:bg-[#EFE7DD]"
+                className="p-2.5 rounded-xl bg-[#FCF9F7] hover:bg-[#F7EAE6]"
               >
                 {t.nav.faq}
               </a>
             </div>
-            <div className="pt-2 flex gap-2">
-              <a
-                href="#consultation"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex-1 py-2.5 rounded-xl bg-[#9A4F3E] text-white text-center text-xs font-bold"
-              >
-                {t.hero.primaryCta}
-              </a>
-              <a
-                href={defaultWaUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 py-2.5 rounded-xl bg-[#157A3E] text-white text-center text-xs font-bold inline-flex items-center justify-center gap-1.5"
-              >
-                <MessageCircle className="w-3.5 h-3.5" />
-                <span>{t.nav.whatsapp}</span>
-              </a>
-            </div>
+            <a
+              href="#consultation"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block w-full py-2.5 rounded-xl bg-[#9A4F3E] text-white text-center text-xs font-bold"
+            >
+              {t.hero.primaryCta}
+            </a>
           </div>
         )}
       </header>
@@ -3018,49 +2923,33 @@ export function App() {
       {view === 'landing' && (
         <main>
           {/* =================================================================
-              SECTION 01 — HERO + CLINICAL GALLERY + STICKY CONSULTATION FORM
+              SECTION 01 — CLEAN LUXURY HERO + SIMPLE CONSULTATION FORM
           ================================================================== */}
           <section
             aria-labelledby="main-heading"
-            className="bg-gradient-to-br from-[#F7EAE6]/80 via-[#FCF9F7] to-[#FCF9F7] py-6 sm:py-10 border-b border-[#E8C9C1]"
+            className="bg-gradient-to-b from-[#F7EAE6]/60 to-[#FCF9F7] py-10 sm:py-16 border-b border-[#E8C9C1]"
           >
-            <div className="max-w-[1320px] mx-auto px-4 sm:px-8 grid grid-cols-1 lg:grid-cols-12 gap-7 xl:gap-10 items-start">
-              {/* LEFT / START COLUMN: Dominant Dental Focus & Clinical Results */}
-              <div className="lg:col-span-7 space-y-5">
-                <div className="space-y-2.5">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#3D221C] text-[#F5D6CC] text-[11px] font-bold uppercase tracking-[0.14em] whitespace-nowrap">
-                      <Sparkles className="w-3 h-3 text-[#F0C6BA] shrink-0" />
-                      <span>{t.hero.kicker}</span>
-                    </span>
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-[#0F6934] text-[11px] font-bold whitespace-nowrap">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#157A3E] shrink-0" />
-                      <span>{t.hero.responseBadge}</span>
-                    </span>
-                  </div>
+            <div className="max-w-[1200px] mx-auto px-4 sm:px-8 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+              {/* LEFT COLUMN: Clean Headline, Concise Value & Minimal Trust Strip */}
+              <div className="lg:col-span-6 space-y-6">
+                <div className="space-y-4">
+                  <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-[#8C4332]">
+                    {t.hero.kicker}
+                  </p>
 
                   <h1
                     id="main-heading"
-                    className="text-3xl sm:text-4xl xl:text-[2.85rem] font-extrabold text-[#1C1918] leading-[1.12] tracking-tight"
+                    className="text-3xl sm:text-5xl font-extrabold text-[#1C1918] leading-[1.12] tracking-tight"
                   >
                     {t.hero.title}
                   </h1>
-                  <p
-                    className="text-sm sm:text-base font-semibold text-[#8C4332]"
-                    style={{
-                      fontFamily: isRTL
-                        ? "'Cairo', sans-serif"
-                        : "'Playfair Display', Georgia, serif",
-                    }}
-                  >
-                    {t.hero.slogan}
-                  </p>
-                  <p className="text-xs sm:text-[15px] text-[#4A3F3B] leading-relaxed max-w-2xl">
+
+                  <p className="text-sm sm:text-base text-[#4A3F3B] leading-relaxed max-w-xl">
                     {t.hero.lead}
                   </p>
                 </div>
 
-                {/* Dual Primary Action Buttons */}
+                {/* Primary CTAs */}
                 <div className="flex flex-wrap items-center gap-3">
                   <a
                     href="#consultation"
@@ -3068,7 +2957,7 @@ export function App() {
                       e.preventDefault();
                       handleSelectServiceAndScroll(selectedServiceValue);
                     }}
-                    className="inline-flex items-center justify-center gap-2 min-h-[48px] px-6 py-2.5 rounded-xl bg-[#9A4F3E] hover:bg-[#7D3D2E] text-white font-bold text-sm shadow-sm transition-all whitespace-nowrap"
+                    className="inline-flex items-center justify-center gap-2 min-h-[48px] px-6 py-3 rounded-xl bg-[#9A4F3E] hover:bg-[#7D3D2E] text-white font-bold text-sm shadow-sm transition-colors whitespace-nowrap"
                   >
                     <span>{t.hero.primaryCta}</span>
                     {isRTL ? (
@@ -3082,139 +2971,41 @@ export function App() {
                     href={defaultWaUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 min-h-[48px] px-5 py-2.5 rounded-xl bg-[#157A3E] hover:bg-[#106231] text-white font-bold text-sm shadow-sm transition-colors whitespace-nowrap"
+                    className="inline-flex items-center justify-center gap-2 min-h-[48px] px-5 py-3 rounded-xl bg-[#157A3E] hover:bg-[#106231] text-white font-bold text-sm shadow-sm transition-colors whitespace-nowrap"
                   >
                     <MessageCircle className="w-4 h-4 shrink-0" />
                     <span>{t.hero.whatsappCta}</span>
-                    <span dir="ltr" className="text-xs opacity-90 font-semibold">
-                      ({WHATSAPP_DISPLAY})
-                    </span>
                   </a>
                 </div>
 
-                {/* Key Credibility Metrics Strip */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                  {t.hero.metrics.map((m) => (
-                    <div
-                      key={m.label}
-                      className="bg-white rounded-2xl border border-[#E8C9C1] px-3.5 py-2.5 shadow-2xs"
-                    >
-                      <p className="text-base sm:text-lg font-extrabold text-[#1C1918] whitespace-nowrap">
+                {/* Minimal 3-Item Trust Row (No Heavy Boxes) */}
+                <div className="pt-4 border-t border-[#E8C9C1] grid grid-cols-3 gap-4 max-w-lg">
+                  {t.hero.metrics.slice(0, 3).map((m) => (
+                    <div key={m.label}>
+                      <p className="text-lg sm:text-xl font-extrabold text-[#1C1918]">
                         {m.value}
                       </p>
-                      <p className="text-[11px] font-semibold text-[#52443F] mt-0.5 truncate">
+                      <p className="text-[11px] font-medium text-[#52443F] mt-0.5">
                         {m.label}
                       </p>
                     </div>
                   ))}
                 </div>
-
-                {/* Clinical Smile Transformations Gallery */}
-                <div id="gallery" className="pt-1 scroll-mt-24 space-y-3">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                    <div>
-                      <h2 className="text-base sm:text-lg font-extrabold text-[#1C1918]">
-                        {t.hero.resultsHeading}
-                      </h2>
-                      <p className="text-xs text-[#52443F]">{t.hero.resultsSub}</p>
-                    </div>
-
-                    <div className="flex flex-wrap items-center gap-1.5 shrink-0">
-                      {(
-                        [
-                          { key: 'all', label: t.hero.filters.all },
-                          { key: 'hollywood', label: t.hero.filters.hollywood },
-                          { key: 'cosmetic', label: t.hero.filters.cosmetic },
-                        ] as const
-                      ).map((tab) => (
-                        <button
-                          key={tab.key}
-                          type="button"
-                          onClick={() => {
-                            setActiveFilter(tab.key);
-                            setLightboxIndex(null);
-                          }}
-                          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors cursor-pointer whitespace-nowrap ${
-                            activeFilter === tab.key
-                              ? 'bg-[#9A4F3E] text-white shadow-2xs'
-                              : 'bg-white text-[#4A3F3B] border border-[#E8C9C1] hover:border-[#B27262]'
-                          }`}
-                        >
-                          {tab.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                    {filteredCases.map((item, index) => (
-                      <button
-                        key={item.id}
-                        type="button"
-                        onClick={() => setLightboxIndex(index)}
-                        className="luxury-card-hover group relative rounded-2xl overflow-hidden bg-white border border-[#E8C9C1] hover:border-[#B27262] shadow-2xs text-start focus:outline-none focus:ring-2 focus:ring-[#B27262] cursor-pointer flex flex-col"
-                      >
-                        <div className="relative aspect-square w-full bg-white p-2 overflow-hidden border-b border-[#F2E2DC]">
-                          <img
-                            src={item.src}
-                            alt={isRTL ? item.titleAr : item.titleEn}
-                            width={600}
-                            height={600}
-                            loading={index < 2 ? 'eager' : 'lazy'}
-                            decoding="async"
-                            onError={(e) => {
-                              e.currentTarget.src = DEFAULT_ASSETS.case1;
-                            }}
-                            className="w-full h-full object-contain group-hover:scale-[1.02] transition-transform duration-300"
-                          />
-                          <span className="absolute bottom-2.5 end-2.5 inline-flex items-center gap-1 text-[10px] font-bold bg-[#3D221C]/90 text-white px-2.5 py-1 rounded-full shadow-xs">
-                            <ZoomIn className="w-3 h-3 text-[#F0C6BA]" />
-                            <span>{t.hero.resultsHint}</span>
-                          </span>
-                        </div>
-                        <div className="p-3 bg-[#FCF9F7] flex-1 flex flex-col justify-between gap-1">
-                          <div className="flex items-center justify-between gap-1.5">
-                            <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#8C4332]">
-                              {isRTL ? item.tagAr : item.tagEn}
-                            </span>
-                            <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#0F6934]">
-                              <BadgeCheck className="w-3 h-3" />
-                              <span>{t.hero.verifiedBadge}</span>
-                            </span>
-                          </div>
-                          <h3 className="text-xs sm:text-sm font-extrabold text-[#1C1918]">
-                            {isRTL ? item.titleAr : item.titleEn}
-                          </h3>
-                          <p className="text-[11px] text-[#52443F] line-clamp-2 leading-relaxed">
-                            {isRTL ? item.captionAr : item.captionEn}
-                          </p>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
               </div>
 
-              {/* RIGHT / END COLUMN: Compact Above-the-Fold Sticky Consultation Form */}
+              {/* RIGHT COLUMN: Clean, Spacious Consultation Form */}
               <section
                 id="consultation"
                 aria-labelledby="form-heading"
-                className="lg:col-span-5 lg:sticky lg:top-[86px] bg-white p-5 sm:p-6 rounded-3xl border-2 border-[#E8C9C1] shadow-[0_18px_48px_rgba(61,34,28,0.08)] scroll-mt-24"
+                className="lg:col-span-6 bg-white p-6 sm:p-8 rounded-3xl border border-[#E8C9C1] shadow-[0_14px_40px_rgba(61,34,28,0.06)] scroll-mt-24 max-w-xl w-full lg:ms-auto"
               >
-                <div className="flex items-center justify-between gap-2 mb-2">
-                  <span className="inline-flex items-center gap-1 text-[11px] font-extrabold text-[#0F6934] bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full whitespace-nowrap">
-                    <CheckCircle2 className="w-3 h-3 shrink-0" />
-                    <span>{t.form.badge}</span>
-                  </span>
-                </div>
-
                 <h2
                   id="form-heading"
-                  className="text-xl sm:text-2xl font-extrabold text-[#1C1918] tracking-tight"
+                  className="text-2xl font-extrabold text-[#1C1918] tracking-tight"
                 >
                   {t.form.heading}
                 </h2>
-                <p className="mt-1 mb-3 text-xs text-[#52443F] leading-relaxed">
+                <p className="mt-1.5 mb-5 text-xs sm:text-sm text-[#52443F] leading-relaxed">
                   {t.form.intro}
                 </p>
 
@@ -3231,7 +3022,7 @@ export function App() {
                       href={buildWhatsAppLinkFromLead(lastSubmittedLead)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-full min-h-[46px] inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#157A3E] hover:bg-[#106231] text-white font-bold text-sm transition-colors shadow-sm"
+                      className="w-full min-h-[46px] inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#157A3E] hover:bg-[#106231] text-white font-bold text-sm transition-colors"
                     >
                       <MessageCircle className="w-4 h-4" />
                       <span>{t.form.confirmWaBtn}</span>
@@ -3249,49 +3040,13 @@ export function App() {
                     </button>
                   </div>
                 ) : (
-                  <form onSubmit={handleSubmit} noValidate className="space-y-2.5">
-                    {/* Quick Single-Line Timeline Selector Pills */}
-                    <div>
-                      <span className="block text-[11px] font-bold text-[#1C1918] mb-1">
-                        {t.form.timelineLabel}
-                      </span>
-                      <div className="grid grid-cols-3 gap-1.5">
-                        {t.form.timelines.map((tl, idx) => {
-                          const compactLabel = isRTL
-                            ? idx === 0
-                              ? 'أقرب وقت'
-                              : idx === 1
-                              ? '١ – ٣ أشهر'
-                              : 'الأسعار'
-                            : idx === 0
-                            ? 'ASAP'
-                            : idx === 1
-                            ? '1–3 Months'
-                            : 'Price Check';
-                          return (
-                            <button
-                              key={tl.value}
-                              type="button"
-                              onClick={() => setSelectedTimeline(tl.value)}
-                              className={`h-9 px-2 rounded-xl text-[11px] font-bold border transition-all cursor-pointer text-center whitespace-nowrap ${
-                                selectedTimeline === tl.value
-                                  ? 'bg-[#3D221C] text-white border-[#3D221C]'
-                                  : 'bg-[#FCF9F7] text-[#4A3F3B] border-[#E8C9C1] hover:border-[#B27262]'
-                              }`}
-                            >
-                              {compactLabel}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                    {/* Row 1: Full Name & Country side-by-side */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <form onSubmit={handleSubmit} noValidate className="space-y-4">
+                    {/* Full Name & Country */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                       <div>
                         <label
                           htmlFor="full-name"
-                          className="block text-xs font-bold text-[#1C1918] mb-1"
+                          className="block text-xs font-bold text-[#1C1918] mb-1.5"
                         >
                           {t.form.fullName} *
                         </label>
@@ -3306,19 +3061,19 @@ export function App() {
                             if (errors.name) setErrors({ ...errors, name: '' });
                           }}
                           placeholder={t.form.fullNamePlaceholder}
-                          className={`w-full h-[42px] px-3 rounded-xl border bg-white text-base sm:text-xs text-[#1C1918] placeholder:text-[#8E7F7A] focus:outline-none focus:ring-2 focus:ring-[#B27262] ${
+                          className={`w-full h-[46px] px-3.5 rounded-xl border bg-white text-base sm:text-sm text-[#1C1918] placeholder:text-[#8E7F7A] focus:outline-none focus:ring-2 focus:ring-[#B27262] ${
                             errors.name ? 'border-red-600' : 'border-[#DDB0A5]'
                           }`}
                         />
                         {errors.name && (
-                          <p className="mt-0.5 text-[11px] text-red-700">{errors.name}</p>
+                          <p className="mt-1 text-xs text-red-700">{errors.name}</p>
                         )}
                       </div>
 
                       <div>
                         <label
                           htmlFor="country"
-                          className="block text-xs font-bold text-[#1C1918] mb-1"
+                          className="block text-xs font-bold text-[#1C1918] mb-1.5"
                         >
                           {t.form.country} *
                         </label>
@@ -3332,21 +3087,21 @@ export function App() {
                             if (errors.country) setErrors({ ...errors, country: '' });
                           }}
                           placeholder={t.form.countryPlaceholder}
-                          className={`w-full h-[42px] px-3 rounded-xl border bg-white text-base sm:text-xs text-[#1C1918] placeholder:text-[#8E7F7A] focus:outline-none focus:ring-2 focus:ring-[#B27262] ${
+                          className={`w-full h-[46px] px-3.5 rounded-xl border bg-white text-base sm:text-sm text-[#1C1918] placeholder:text-[#8E7F7A] focus:outline-none focus:ring-2 focus:ring-[#B27262] ${
                             errors.country ? 'border-red-600' : 'border-[#DDB0A5]'
                           }`}
                         />
                         {errors.country && (
-                          <p className="mt-0.5 text-[11px] text-red-700">{errors.country}</p>
+                          <p className="mt-1 text-xs text-red-700">{errors.country}</p>
                         )}
                       </div>
                     </div>
 
-                    {/* Row 2: WhatsApp Number with Compact Flag+Code Selector */}
+                    {/* WhatsApp Number */}
                     <div>
                       <label
                         htmlFor="whatsapp-phone"
-                        className="block text-xs font-bold text-[#1C1918] mb-1"
+                        className="block text-xs font-bold text-[#1C1918] mb-1.5"
                       >
                         {t.form.whatsapp} *
                       </label>
@@ -3355,7 +3110,7 @@ export function App() {
                           aria-label={t.form.countryCodeAria}
                           value={countryCode}
                           onChange={(e) => setCountryCode(e.target.value)}
-                          className="w-[106px] shrink-0 h-[42px] px-2 rounded-xl border border-[#DDB0A5] bg-[#FCF9F7] text-xs font-bold text-[#1C1918] focus:outline-none focus:ring-2 focus:ring-[#B27262]"
+                          className="w-[106px] shrink-0 h-[46px] px-2.5 rounded-xl border border-[#DDB0A5] bg-[#FCF9F7] text-xs font-bold text-[#1C1918] focus:outline-none focus:ring-2 focus:ring-[#B27262]"
                         >
                           {COUNTRY_CODES.map((c) => (
                             <option key={c.id} value={c.code}>
@@ -3373,86 +3128,40 @@ export function App() {
                             if (errors.phone) setErrors({ ...errors, phone: '' });
                           }}
                           placeholder={t.form.whatsappPlaceholder}
-                          className={`flex-1 min-w-0 h-[42px] px-3 rounded-xl border bg-white text-base sm:text-xs text-[#1C1918] placeholder:text-[#8E7F7A] focus:outline-none focus:ring-2 focus:ring-[#B27262] ${
+                          className={`flex-1 min-w-0 h-[46px] px-3.5 rounded-xl border bg-white text-base sm:text-sm text-[#1C1918] placeholder:text-[#8E7F7A] focus:outline-none focus:ring-2 focus:ring-[#B27262] ${
                             errors.phone ? 'border-red-600' : 'border-[#DDB0A5]'
                           }`}
                         />
                       </div>
                       {errors.phone && (
-                        <p className="mt-0.5 text-[11px] text-red-700">{errors.phone}</p>
+                        <p className="mt-1 text-xs text-red-700">{errors.phone}</p>
                       )}
                     </div>
 
-                    {/* Row 3: Interested Treatment & Optional Email */}
-                    <div className="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
-                      <div className="sm:col-span-7">
-                        <label
-                          htmlFor="interested-service"
-                          className="block text-xs font-bold text-[#1C1918] mb-1"
-                        >
-                          {t.form.serviceLabel}
-                        </label>
-                        <select
-                          id="interested-service"
-                          value={selectedServiceValue}
-                          onChange={(e) => setSelectedServiceValue(e.target.value)}
-                          className="w-full h-[42px] px-2.5 rounded-xl border border-[#DDB0A5] bg-white text-xs font-semibold text-[#1C1918] focus:outline-none focus:ring-2 focus:ring-[#B27262]"
-                        >
-                          {t.form.services.map((srv) => (
-                            <option key={srv.value} value={srv.value}>
-                              {srv.label}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-
-                      <div className="sm:col-span-5">
-                        <label
-                          htmlFor="email"
-                          className="block text-xs font-bold text-[#1C1918] mb-1 truncate"
-                        >
-                          {t.form.email}
-                        </label>
-                        <input
-                          id="email"
-                          type="email"
-                          autoComplete="email"
-                          value={email}
-                          onChange={(e) => {
-                            setEmail(e.target.value);
-                            if (errors.email) setErrors({ ...errors, email: '' });
-                          }}
-                          placeholder={t.form.emailPlaceholder}
-                          className={`w-full h-[42px] px-3 rounded-xl border bg-white text-base sm:text-xs text-[#1C1918] placeholder:text-[#8E7F7A] focus:outline-none focus:ring-2 focus:ring-[#B27262] ${
-                            errors.email ? 'border-red-600' : 'border-[#DDB0A5]'
-                          }`}
-                        />
-                        {errors.email && (
-                          <p className="mt-0.5 text-[11px] text-red-700">{errors.email}</p>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Row 4: Compact Optional Notes */}
+                    {/* Interested Treatment */}
                     <div>
                       <label
-                        htmlFor="message"
-                        className="block text-xs font-bold text-[#1C1918] mb-1"
+                        htmlFor="interested-service"
+                        className="block text-xs font-bold text-[#1C1918] mb-1.5"
                       >
-                        {t.form.message}
+                        {t.form.serviceLabel}
                       </label>
-                      <input
-                        id="message"
-                        type="text"
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
-                        placeholder={t.form.messagePlaceholder}
-                        className="w-full h-[40px] px-3 rounded-xl border border-[#DDB0A5] bg-white text-base sm:text-xs text-[#1C1918] placeholder:text-[#8E7F7A] focus:outline-none focus:ring-2 focus:ring-[#B27262]"
-                      />
+                      <select
+                        id="interested-service"
+                        value={selectedServiceValue}
+                        onChange={(e) => setSelectedServiceValue(e.target.value)}
+                        className="w-full h-[46px] px-3.5 rounded-xl border border-[#DDB0A5] bg-white text-sm font-semibold text-[#1C1918] focus:outline-none focus:ring-2 focus:ring-[#B27262]"
+                      >
+                        {t.form.services.map((srv) => (
+                          <option key={srv.value} value={srv.value}>
+                            {srv.label}
+                          </option>
+                        ))}
+                      </select>
                     </div>
 
                     {/* Privacy Consent */}
-                    <label className="flex items-start gap-2 text-[11px] text-[#52443F] cursor-pointer pt-0.5">
+                    <label className="flex items-start gap-2.5 text-xs text-[#52443F] cursor-pointer">
                       <input
                         type="checkbox"
                         checked={consent}
@@ -3460,50 +3169,38 @@ export function App() {
                           setConsent(e.target.checked);
                           if (errors.consent) setErrors({ ...errors, consent: '' });
                         }}
-                        className="mt-0.5 h-3.5 w-3.5 rounded border-[#DDB0A5] accent-[#9A4F3E]"
+                        className="mt-0.5 h-4 w-4 rounded border-[#DDB0A5] accent-[#9A4F3E]"
                       />
                       <span className="leading-snug">{t.form.consent}</span>
                     </label>
                     {errors.consent && (
-                      <p className="text-[11px] text-red-700">{errors.consent}</p>
+                      <p className="text-xs text-red-700">{errors.consent}</p>
                     )}
 
-                    {/* Submit CTA + WhatsApp Direct Row */}
-                    <div className="pt-1 space-y-2">
-                      <button
-                        type="submit"
-                        disabled={submitting}
-                        className="w-full h-[46px] inline-flex items-center justify-center gap-2 px-5 rounded-xl bg-[#9A4F3E] hover:bg-[#7D3D2E] disabled:opacity-60 text-white font-extrabold text-sm shadow-md transition-colors cursor-pointer"
-                      >
-                        {submitting ? (
-                          <>
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                            <span>{t.form.submitting}</span>
-                          </>
-                        ) : (
-                          <>
-                            <span>{t.form.submit}</span>
-                            {isRTL ? (
-                              <ArrowLeft className="w-4 h-4" />
-                            ) : (
-                              <ArrowRight className="w-4 h-4" />
-                            )}
-                          </>
-                        )}
-                      </button>
+                    {/* Submit CTA */}
+                    <button
+                      type="submit"
+                      disabled={submitting}
+                      className="w-full h-[50px] inline-flex items-center justify-center gap-2 px-5 rounded-xl bg-[#9A4F3E] hover:bg-[#7D3D2E] disabled:opacity-60 text-white font-extrabold text-sm shadow-sm transition-colors cursor-pointer"
+                    >
+                      {submitting ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <span>{t.form.submitting}</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>{t.form.submit}</span>
+                          {isRTL ? (
+                            <ArrowLeft className="w-4 h-4" />
+                          ) : (
+                            <ArrowRight className="w-4 h-4" />
+                          )}
+                        </>
+                      )}
+                    </button>
 
-                      <a
-                        href={defaultWaUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-full h-[40px] inline-flex items-center justify-center gap-2 px-4 rounded-xl border border-[#157A3E]/35 bg-[#157A3E]/10 hover:bg-[#157A3E]/18 text-[#0F6934] font-bold text-xs transition-colors"
-                      >
-                        <MessageCircle className="w-3.5 h-3.5" />
-                        <span>{t.form.whatsappDirect}</span>
-                      </a>
-                    </div>
-
-                    <p className="text-[10px] text-center font-medium text-[#52443F]">
+                    <p className="text-[11px] text-center font-medium text-[#52443F]">
                       {t.form.note}
                     </p>
                   </form>
@@ -3513,37 +3210,122 @@ export function App() {
           </section>
 
           {/* =================================================================
-              SECTION 02 — SIGNATURE DENTAL TREATMENTS & PACKAGES
+              SECTION 02 — BEFORE & AFTER CLINICAL GALLERY
+          ================================================================== */}
+          <section
+            id="gallery"
+            aria-labelledby="gallery-heading"
+            className="py-14 sm:py-20 bg-white border-b border-[#E8C9C1] scroll-mt-20"
+          >
+            <div className="max-w-[1200px] mx-auto px-4 sm:px-8 space-y-8">
+              <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                <div className="space-y-1.5">
+                  <h2
+                    id="gallery-heading"
+                    className="text-2xl sm:text-3xl font-extrabold text-[#1C1918] tracking-tight"
+                  >
+                    {t.hero.resultsHeading}
+                  </h2>
+                  <p className="text-sm text-[#52443F]">{t.hero.resultsSub}</p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2 shrink-0">
+                  {(
+                    [
+                      { key: 'all', label: t.hero.filters.all },
+                      { key: 'hollywood', label: t.hero.filters.hollywood },
+                      { key: 'cosmetic', label: t.hero.filters.cosmetic },
+                    ] as const
+                  ).map((tab) => (
+                    <button
+                      key={tab.key}
+                      type="button"
+                      onClick={() => {
+                        setActiveFilter(tab.key);
+                        setLightboxIndex(null);
+                      }}
+                      className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-colors cursor-pointer whitespace-nowrap ${
+                        activeFilter === tab.key
+                          ? 'bg-[#9A4F3E] text-white'
+                          : 'bg-[#FCF9F7] text-[#4A3F3B] border border-[#E8C9C1] hover:border-[#B27262]'
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredCases.map((item, index) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => setLightboxIndex(index)}
+                    className="luxury-card-hover group rounded-2xl overflow-hidden bg-white border border-[#E8C9C1] hover:border-[#B27262] text-start focus:outline-none focus:ring-2 focus:ring-[#B27262] cursor-pointer flex flex-col"
+                  >
+                    <div className="aspect-square w-full bg-white p-2 border-b border-[#F2E2DC] overflow-hidden">
+                      <img
+                        src={item.src}
+                        alt={isRTL ? item.titleAr : item.titleEn}
+                        width={600}
+                        height={600}
+                        loading={index < 3 ? 'eager' : 'lazy'}
+                        decoding="async"
+                        onError={(e) => {
+                          e.currentTarget.src = DEFAULT_ASSETS.case1;
+                        }}
+                        className="w-full h-full object-contain group-hover:scale-[1.02] transition-transform duration-300"
+                      />
+                    </div>
+                    <div className="p-4 bg-[#FCF9F7] flex items-center justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="text-[11px] font-bold text-[#8C4332]">
+                          {isRTL ? item.tagAr : item.tagEn}
+                        </p>
+                        <h3 className="text-sm font-extrabold text-[#1C1918] truncate mt-0.5">
+                          {isRTL ? item.titleAr : item.titleEn}
+                        </h3>
+                      </div>
+                      <ZoomIn className="w-4 h-4 text-[#9A4F3E] shrink-0" />
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* =================================================================
+              SECTION 03 — SIGNATURE DENTAL TREATMENTS
           ================================================================== */}
           <section
             id="treatments"
             aria-labelledby="treatments-heading"
-            className="py-12 sm:py-16 bg-white border-b border-[#E8C9C1] scroll-mt-20"
+            className="py-14 sm:py-20 bg-[#FCF9F7] border-b border-[#E8C9C1] scroll-mt-20"
           >
-            <div className="max-w-[1320px] mx-auto px-4 sm:px-8 space-y-8">
+            <div className="max-w-[1200px] mx-auto px-4 sm:px-8 space-y-10">
               <div className="max-w-2xl space-y-2">
                 <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-[#8C4332]">
                   {t.treatmentsSection.kicker}
                 </p>
                 <h2
                   id="treatments-heading"
-                  className="text-2xl sm:text-4xl font-extrabold text-[#1C1918] tracking-tight"
+                  className="text-2xl sm:text-3xl font-extrabold text-[#1C1918] tracking-tight"
                 >
                   {t.treatmentsSection.heading}
                 </h2>
-                <p className="text-sm sm:text-base text-[#52443F] leading-relaxed">
+                <p className="text-sm text-[#52443F] leading-relaxed">
                   {t.treatmentsSection.sub}
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {t.treatmentsSection.items.map((pkg) => (
                   <article
                     key={pkg.value}
-                    className="luxury-card-hover rounded-3xl bg-[#FCF9F7] border border-[#E8C9C1] hover:border-[#B27262] p-5 sm:p-6 grid grid-cols-1 sm:grid-cols-12 gap-5 items-center"
+                    className="luxury-card-hover rounded-3xl bg-white border border-[#E8C9C1] p-5 sm:p-6 grid grid-cols-1 sm:grid-cols-12 gap-5 items-center"
                   >
-                    {/* Left: Clinical Before & After Service Image */}
-                    <div className="sm:col-span-5 rounded-2xl bg-white border border-[#E8C9C1] p-2 overflow-hidden shadow-2xs">
+                    <div className="sm:col-span-5 rounded-2xl bg-[#FCF9F7] border border-[#F2E2DC] p-2 overflow-hidden">
                       <img
                         src={pkg.image}
                         alt={pkg.title}
@@ -3555,47 +3337,29 @@ export function App() {
                       />
                     </div>
 
-                    {/* Right: Treatment Details & CTA */}
-                    <div className="sm:col-span-7 flex flex-col justify-between gap-4 h-full">
-                      <div className="space-y-3">
+                    <div className="sm:col-span-7 flex flex-col justify-between gap-4">
+                      <div className="space-y-2.5">
                         <div className="flex flex-wrap items-center gap-1.5">
-                          <span className="px-2.5 py-0.5 rounded-full bg-[#3D221C] text-[#F5D6CC] text-[11px] font-bold">
-                            {pkg.badge}
+                          <span className="px-2.5 py-0.5 rounded-md bg-[#F7EAE6] text-[#8C4332] text-[11px] font-bold">
+                            {pkg.stay}
                           </span>
-                          <span className="px-2 py-0.5 rounded-md bg-white border border-[#E8C9C1] text-[#1C1918] text-[11px] font-bold">
-                            ⏱ {pkg.stay}
-                          </span>
-                          <span className="px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-200 text-[#0F6934] text-[11px] font-bold">
-                            ✓ {pkg.warranty}
+                          <span className="px-2.5 py-0.5 rounded-md bg-emerald-50 text-[#0F6934] text-[11px] font-bold">
+                            {pkg.warranty}
                           </span>
                         </div>
 
-                        <div>
-                          <h3 className="text-lg sm:text-xl font-extrabold text-[#1C1918] leading-snug">
-                            {pkg.title}
-                          </h3>
-                          <p className="mt-1.5 text-xs text-[#4A3F3B] leading-relaxed">
-                            {pkg.desc}
-                          </p>
-                        </div>
-
-                        <ul className="space-y-1.5 pt-2 border-t border-[#E8C9C1]">
-                          {pkg.highlights.map((h) => (
-                            <li
-                              key={h}
-                              className="flex items-start gap-1.5 text-xs text-[#1C1918] font-medium"
-                            >
-                              <CheckCircle2 className="w-3.5 h-3.5 text-[#0F6934] shrink-0 mt-0.5" />
-                              <span>{h}</span>
-                            </li>
-                          ))}
-                        </ul>
+                        <h3 className="text-lg font-extrabold text-[#1C1918] leading-snug">
+                          {pkg.title}
+                        </h3>
+                        <p className="text-xs sm:text-sm text-[#4A3F3B] leading-relaxed">
+                          {pkg.desc}
+                        </p>
                       </div>
 
                       <button
                         type="button"
                         onClick={() => handleSelectServiceAndScroll(pkg.value)}
-                        className="w-full min-h-[44px] inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-[#9A4F3E] hover:bg-[#7D3D2E] text-white font-bold text-xs transition-colors cursor-pointer shadow-xs"
+                        className="w-full h-[44px] inline-flex items-center justify-center gap-2 px-4 rounded-xl bg-[#9A4F3E] hover:bg-[#7D3D2E] text-white font-bold text-xs transition-colors cursor-pointer"
                       >
                         <span>{t.treatmentsSection.ctaText}</span>
                         {isRTL ? (
@@ -3612,245 +3376,59 @@ export function App() {
           </section>
 
           {/* =================================================================
-              SECTION 03 — WHY INTERNATIONAL PATIENTS CHOOSE ESTELUX
-          ================================================================== */}
-          <section
-            id="why-estelux"
-            aria-labelledby="why-heading"
-            className="py-14 sm:py-20 bg-[#3D221C] text-[#FAF5F2] border-b border-[#5A352C] scroll-mt-20"
-          >
-            <div className="max-w-[1320px] mx-auto px-4 sm:px-8 space-y-10">
-              <div className="max-w-2xl space-y-2">
-                <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-[#F0C6BA]">
-                  {t.whyUs.kicker}
-                </p>
-                <h2
-                  id="why-heading"
-                  className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight"
-                >
-                  {t.whyUs.heading}
-                </h2>
-                <p className="text-sm sm:text-base text-[#F2DDD7] leading-relaxed">
-                  {t.whyUs.sub}
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                {t.whyUs.items.map((item, idx) => {
-                  const Icon =
-                    idx === 0
-                      ? Sparkles
-                      : idx === 1
-                        ? ShieldCheck
-                        : idx === 2
-                          ? Stethoscope
-                          : HeartHandshake;
-                  return (
-                    <article
-                      key={item.title}
-                      className="rounded-2xl bg-[#4E2C25] border border-[#6E4238] p-6 space-y-3.5 hover:border-[#DDB0A5] transition-colors"
-                    >
-                      <div className="w-11 h-11 rounded-xl bg-[#B27262]/25 border border-[#DDB0A5]/45 flex items-center justify-center text-[#F5D6CC]">
-                        <Icon className="w-5 h-5" />
-                      </div>
-                      <h3 className="text-base sm:text-lg font-extrabold text-white">
-                        {item.title}
-                      </h3>
-                      <p className="text-xs sm:text-sm text-[#F2DDD7] leading-relaxed">
-                        {item.desc}
-                      </p>
-                    </article>
-                  );
-                })}
-              </div>
-            </div>
-          </section>
-
-          {/* =================================================================
-              SECTION 04 — 4-STEP PATIENT JOURNEY + VIP MEDICAL TOURISM SUPPORT
+              SECTION 04 — 4-STEP PATIENT JOURNEY + VIP ISTANBUL SUPPORT
           ================================================================== */}
           <section
             id="journey"
             aria-labelledby="journey-heading"
-            className="py-14 sm:py-20 bg-[#EFE7DD]/65 border-b border-[#E5D6CE] scroll-mt-20"
+            className="py-14 sm:py-20 bg-white border-b border-[#E8C9C1] scroll-mt-20"
           >
-            <div className="max-w-[1320px] mx-auto px-4 sm:px-8 space-y-12">
+            <div className="max-w-[1200px] mx-auto px-4 sm:px-8 space-y-10">
               <div className="max-w-2xl space-y-2">
                 <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-[#8C4332]">
                   {t.journey.kicker}
                 </p>
                 <h2
                   id="journey-heading"
-                  className="text-2xl sm:text-4xl font-extrabold text-[#1C1918] tracking-tight"
+                  className="text-2xl sm:text-3xl font-extrabold text-[#1C1918] tracking-tight"
                 >
                   {t.journey.heading}
                 </h2>
-                <p className="text-sm sm:text-base text-[#5A4E4A] leading-relaxed">
-                  {t.journey.sub}
-                </p>
+                <p className="text-sm text-[#52443F] leading-relaxed">{t.journey.sub}</p>
               </div>
 
-              {/* 4-Step Timeline Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                 {t.journey.steps.map((step) => (
                   <div
                     key={step.num}
-                    className="bg-white rounded-2xl border border-[#E5D6CE] p-6 space-y-3 shadow-2xs relative"
+                    className="bg-[#FCF9F7] rounded-2xl border border-[#E8C9C1] p-6 space-y-2.5"
                   >
-                    <span className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-[#9A4F3E] text-white font-extrabold text-sm">
+                    <span className="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-[#9A4F3E] text-white font-extrabold text-xs">
                       {step.num}
                     </span>
                     <h3 className="text-base font-extrabold text-[#1C1918]">{step.title}</h3>
-                    <p className="text-xs sm:text-sm text-[#5A4E4A] leading-relaxed">
+                    <p className="text-xs sm:text-sm text-[#52443F] leading-relaxed">
                       {step.desc}
                     </p>
                   </div>
                 ))}
               </div>
 
-              {/* VIP Medical Travel Pillars */}
-              <div className="bg-white rounded-3xl border border-[#E5D6CE] p-6 sm:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center shadow-2xs">
-                <div className="lg:col-span-4 space-y-1.5">
-                  <h3 className="text-xl sm:text-2xl font-extrabold text-[#1C1918] tracking-tight">
-                    {t.tourism.heading}
-                  </h3>
-                  <p className="text-xs sm:text-sm text-[#5A4E4A] leading-relaxed">
-                    {t.tourism.sub}
-                  </p>
-                </div>
-
-                <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-6">
-                  {t.tourism.items.map((item, idx) => {
-                    const Icon = idx === 0 ? Plane : idx === 1 ? Building2 : CalendarCheck;
-                    return (
-                      <article
-                        key={item.title}
-                        className="border-s-2 border-[#C47D6B]/40 ps-4 flex flex-col gap-2"
-                      >
-                        <div className="w-10 h-10 rounded-xl bg-[#FAF7F2] border border-[#E5D6CE] flex items-center justify-center">
-                          <Icon className="w-5 h-5 text-[#C47D6B]" strokeWidth={1.9} />
-                        </div>
-                        <h4 className="text-xs sm:text-sm font-extrabold tracking-wider uppercase text-[#1C1918] mt-1">
-                          {item.title}
-                        </h4>
-                        <p className="text-xs text-[#4A3F3B] leading-relaxed">{item.desc}</p>
-                      </article>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* =================================================================
-              SECTION 05 — VERIFIED INTERNATIONAL PATIENT REVIEWS
-          ================================================================== */}
-          <section
-            id="reviews"
-            aria-labelledby="reviews-heading"
-            className="py-14 sm:py-20 bg-white border-b border-[#E5D6CE] scroll-mt-20"
-          >
-            <div className="max-w-[1320px] mx-auto px-4 sm:px-8 space-y-10">
-              <div className="max-w-2xl space-y-2">
-                <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-[#8C4332]">
-                  {t.reviews.kicker}
-                </p>
-                <h2
-                  id="reviews-heading"
-                  className="text-2xl sm:text-4xl font-extrabold text-[#1C1918] tracking-tight"
-                >
-                  {t.reviews.heading}
-                </h2>
-                <p className="text-sm sm:text-base text-[#5A4E4A] leading-relaxed">
-                  {t.reviews.sub}
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                {t.reviews.items.map((rev) => (
-                  <article
-                    key={rev.name}
-                    className="rounded-2xl bg-[#FAF7F2] border border-[#E5D6CE] p-6 flex flex-col justify-between gap-4 shadow-2xs"
-                  >
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-1 text-amber-500">
-                          {[...Array(5)].map((_, i) => (
-                            <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
-                          ))}
-                        </div>
-                        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#1E9E54] bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
-                          <BadgeCheck className="w-3.5 h-3.5" />
-                          <span>{t.reviews.verifiedLabel}</span>
-                        </span>
-                      </div>
-                      <p className="text-xs sm:text-sm text-[#1C1918] leading-relaxed italic">
-                        "{rev.quote}"
-                      </p>
-                    </div>
-
-                    <div className="pt-3 border-t border-[#E5D6CE] flex items-center justify-between gap-2 text-xs">
-                      <div>
-                        <p className="font-extrabold text-[#1C1918]">{rev.name}</p>
-                        <p className="text-[#6E605B] font-medium">{rev.country}</p>
-                      </div>
-                      <span className="px-2.5 py-1 rounded-lg bg-white border border-[#E5D6CE] font-bold text-[#8C4332]">
-                        {rev.treatment}
-                      </span>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          {/* =================================================================
-              SECTION 06 — FREQUENTLY ASKED QUESTIONS (ACCORDION)
-          ================================================================== */}
-          <section
-            id="faq"
-            aria-labelledby="faq-heading"
-            className="py-14 sm:py-20 bg-[#FAF7F2] border-b border-[#E5D6CE] scroll-mt-20"
-          >
-            <div className="max-w-[920px] mx-auto px-4 sm:px-8 space-y-8">
-              <div className="text-center space-y-2">
-                <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-[#8C4332]">
-                  {t.faq.kicker}
-                </p>
-                <h2
-                  id="faq-heading"
-                  className="text-2xl sm:text-4xl font-extrabold text-[#1C1918] tracking-tight"
-                >
-                  {t.faq.heading}
-                </h2>
-                <p className="text-sm text-[#5A4E4A]">{t.faq.sub}</p>
-              </div>
-
-              <div className="space-y-3">
-                {t.faq.items.map((item, idx) => {
-                  const isOpen = openFaqIndex === idx;
+              {/* Simple 3-Pillar VIP Travel Strip */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 pt-4 border-t border-[#E8C9C1]">
+                {t.tourism.items.map((item, idx) => {
+                  const Icon = idx === 0 ? Plane : idx === 1 ? Building2 : CalendarCheck;
                   return (
-                    <div
-                      key={item.q}
-                      className="rounded-2xl bg-white border border-[#E5D6CE] overflow-hidden shadow-2xs"
-                    >
-                      <button
-                        type="button"
-                        aria-expanded={isOpen}
-                        onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
-                        className="w-full px-5 py-4 text-start flex items-center justify-between gap-4 font-bold text-sm sm:text-base text-[#1C1918] hover:text-[#C47D6B] transition-colors cursor-pointer"
-                      >
-                        <span>{item.q}</span>
-                        <ChevronDown
-                          className={`w-5 h-5 text-[#C47D6B] shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''
-                            }`}
-                        />
-                      </button>
-                      {isOpen && (
-                        <div className="px-5 pb-5 pt-1 text-xs sm:text-sm text-[#4A3F3B] leading-relaxed border-t border-[#FAF7F2]">
-                          {item.a}
-                        </div>
-                      )}
+                    <div key={item.title} className="flex items-start gap-3.5">
+                      <div className="w-10 h-10 rounded-xl bg-[#F7EAE6] flex items-center justify-center shrink-0">
+                        <Icon className="w-5 h-5 text-[#8C4332]" strokeWidth={1.8} />
+                      </div>
+                      <div>
+                        <h3 className="text-xs font-extrabold uppercase tracking-wider text-[#1C1918]">
+                          {item.title}
+                        </h3>
+                        <p className="text-xs text-[#52443F] mt-1 leading-relaxed">{item.desc}</p>
+                      </div>
                     </div>
                   );
                 })}
@@ -3859,49 +3437,47 @@ export function App() {
           </section>
 
           {/* =================================================================
-              SECTION 07 — SECONDARY MEDICAL SERVICES (HAIR, PLASTIC, SPINE)
+              SECTION 05 — PATIENT REVIEWS (3 CLEAN CARDS)
           ================================================================== */}
           <section
-            id="services"
-            aria-labelledby="services-heading"
-            className="py-14 sm:py-16 bg-white border-b border-[#E5D6CE] scroll-mt-20"
+            id="reviews"
+            aria-labelledby="reviews-heading"
+            className="py-14 sm:py-20 bg-[#FCF9F7] border-b border-[#E8C9C1] scroll-mt-20"
           >
-            <div className="max-w-[1320px] mx-auto px-4 sm:px-8">
-              <div className="max-w-xl">
-                <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#8C4332] mb-1.5">
-                  {t.services.kicker}
+            <div className="max-w-[1200px] mx-auto px-4 sm:px-8 space-y-8">
+              <div className="max-w-2xl space-y-2">
+                <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-[#8C4332]">
+                  {t.reviews.kicker}
                 </p>
                 <h2
-                  id="services-heading"
-                  className="text-2xl sm:text-4xl font-extrabold text-[#1C1918] tracking-tight"
+                  id="reviews-heading"
+                  className="text-2xl sm:text-3xl font-extrabold text-[#1C1918] tracking-tight"
                 >
-                  {t.services.heading}
+                  {t.reviews.heading}
                 </h2>
-                <p className="mt-1.5 text-sm text-[#5A4E4A]">{t.services.sub}</p>
               </div>
 
-              <div className="mt-7 grid grid-cols-1 md:grid-cols-3 gap-5">
-                {t.services.items.map((srv) => (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {t.reviews.items.slice(0, 3).map((rev) => (
                   <article
-                    key={srv.value}
-                    className="luxury-card-hover p-6 rounded-2xl bg-[#FAF7F2] border border-[#E5D6CE] hover:border-[#C47D6B] flex flex-col justify-between gap-4"
+                    key={rev.name}
+                    className="rounded-2xl bg-white border border-[#E8C9C1] p-6 flex flex-col justify-between gap-4"
                   >
-                    <div>
-                      <h3 className="text-base sm:text-lg font-extrabold text-[#1C1918]">
-                        {srv.title}
-                      </h3>
-                      <p className="mt-2 text-xs sm:text-sm text-[#5A4E4A] leading-relaxed">
-                        {srv.desc}
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-1">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                        ))}
+                      </div>
+                      <p className="text-xs sm:text-sm text-[#1C1918] leading-relaxed">
+                        "{rev.quote}"
                       </p>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => handleSelectServiceAndScroll(srv.value)}
-                      className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#8C4332] hover:text-[#1C1918] underline underline-offset-4 self-start cursor-pointer"
-                    >
-                      <span>{srv.linkText}</span>
-                      <ArrowUpRight className="w-4 h-4" />
-                    </button>
+
+                    <div className="pt-3 border-t border-[#F2E2DC] text-xs">
+                      <p className="font-extrabold text-[#1C1918]">{rev.name}</p>
+                      <p className="text-[#52443F] mt-0.5">{rev.country}</p>
+                    </div>
                   </article>
                 ))}
               </div>
@@ -3909,39 +3485,55 @@ export function App() {
           </section>
 
           {/* =================================================================
-              SECTION 08 — PRE-FOOTER CONVERSION BANNER
+              SECTION 06 — FREQUENTLY ASKED QUESTIONS (4 ESSENTIAL Q&As)
           ================================================================== */}
-          <section className="py-12 sm:py-16 bg-gradient-to-r from-[#3D221C] via-[#4E2C25] to-[#3D221C] text-white">
-            <div className="max-w-[1320px] mx-auto px-4 sm:px-8 flex flex-col lg:flex-row items-center justify-between gap-6 text-center lg:text-start">
-              <div className="space-y-2 max-w-2xl">
-                <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-[#F0C6BA]">
-                  {t.ctaBanner.kicker}
+          <section
+            id="faq"
+            aria-labelledby="faq-heading"
+            className="py-14 sm:py-20 bg-white scroll-mt-20"
+          >
+            <div className="max-w-[820px] mx-auto px-4 sm:px-8 space-y-8">
+              <div className="text-center space-y-2">
+                <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-[#8C4332]">
+                  {t.faq.kicker}
                 </p>
-                <h2 className="text-2xl sm:text-3xl font-extrabold text-white">
-                  {t.ctaBanner.heading}
+                <h2
+                  id="faq-heading"
+                  className="text-2xl sm:text-3xl font-extrabold text-[#1C1918] tracking-tight"
+                >
+                  {t.faq.heading}
                 </h2>
-                <p className="text-xs sm:text-sm text-[#F2DDD7] leading-relaxed">
-                  {t.ctaBanner.sub}
-                </p>
               </div>
 
-              <div className="flex flex-wrap items-center justify-center gap-3 shrink-0">
-                <button
-                  type="button"
-                  onClick={() => handleSelectServiceAndScroll('hollywood')}
-                  className="min-h-[48px] px-6 py-3 rounded-xl bg-[#9A4F3E] hover:bg-[#7D3D2E] text-white font-bold text-sm transition-colors cursor-pointer"
-                >
-                  {t.ctaBanner.primaryBtn}
-                </button>
-                <a
-                  href={defaultWaUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="min-h-[48px] px-6 py-3 rounded-xl bg-[#157A3E] hover:bg-[#198747] text-white font-bold text-sm inline-flex items-center gap-2 transition-colors"
-                >
-                  <MessageCircle className="w-4 h-4" />
-                  <span>{t.ctaBanner.waBtn}</span>
-                </a>
+              <div className="space-y-3">
+                {t.faq.items.slice(0, 4).map((item, idx) => {
+                  const isOpen = openFaqIndex === idx;
+                  return (
+                    <div
+                      key={item.q}
+                      className="rounded-2xl bg-[#FCF9F7] border border-[#E8C9C1] overflow-hidden"
+                    >
+                      <button
+                        type="button"
+                        aria-expanded={isOpen}
+                        onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
+                        className="w-full px-5 py-4 text-start flex items-center justify-between gap-4 font-bold text-sm sm:text-base text-[#1C1918] hover:text-[#9A4F3E] transition-colors cursor-pointer"
+                      >
+                        <span>{item.q}</span>
+                        <ChevronDown
+                          className={`w-5 h-5 text-[#9A4F3E] shrink-0 transition-transform duration-200 ${
+                            isOpen ? 'rotate-180' : ''
+                          }`}
+                        />
+                      </button>
+                      {isOpen && (
+                        <div className="px-5 pb-5 pt-1 text-xs sm:text-sm text-[#4A3F3B] leading-relaxed">
+                          {item.a}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </section>
